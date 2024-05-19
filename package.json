@@ -1,0 +1,4 @@
+{
+  "name": "socket.io-serverless",
+  "packageManager": "yarn@4.2.2"
+}
