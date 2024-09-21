@@ -1,0 +1,3 @@
+[submodule "socket.io"]
+	path = socket.io
+	url = https://github.com/socketio/socket.io.git
