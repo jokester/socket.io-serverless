@@ -1,0 +1,4 @@
+{
+  "name": "socket.io-serverless",
+  "description": "run socket.io server in Cloudflare workers."
+}

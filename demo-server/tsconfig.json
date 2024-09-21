@@ -1,0 +1,9 @@
+{
+  "extends": "@tsconfig/strictest/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "moduleResolution": "bundler"
+  }
+}

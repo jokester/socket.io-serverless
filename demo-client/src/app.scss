@@ -1,0 +1,10 @@
+@import url(@blueprintjs/core/lib/css/blueprint.css);
+@import url(@blueprintjs/icons/lib/css/blueprint-icons.css);
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+img[alt=qrcode] {
+    image-rendering: pixelated;
+}
