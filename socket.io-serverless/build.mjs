@@ -10,8 +10,8 @@ const debugLogger = debug('demo-server:build');
 const ___file = new URL(import.meta.url).pathname;
 
 const ___dirname = path.dirname(___file);
-const sioPackagesRoot = path.join(___dirname, '../packages');
-const sioServerlessRoot = path.join(___dirname, '../socket.io-serverless');
+const sioPackagesRoot = path.join(___dirname, '../socket.io/packages');
+const sioServerlessRoot = ___dirname; // path.join(___dirname, '../socket.io-serverless');
 const mocksRoot = path.join(sioServerlessRoot, 'mocks');
 
 async function getLocalSioDir(pkgName) {
@@ -159,7 +159,7 @@ const nodeBuildContext = {
  */
 
 const cfBuildContext = {
-  entryPoints: ['src/cf/main.ts'],
+  entryPoints: ['src/cf/index.ts'],
   bundle: true,
   platform: 'neutral',
   metafile: true,

@@ -45,7 +45,8 @@ export class EioSocket extends Socket {
         // TODO: subscribe to close/error inside SioActor code
     }
 
-    protected override schedulePing() {
+    // @ts-ignore
+    schedulePing() {
         // rewrite to workaround incompatible 'timer' polyfill in CF worker
         // (this also removes server-initiated ping timeout detection in protocol v4)
         this.pingTimeoutTimer = {

@@ -7,16 +7,17 @@
   "dependencies": {
     "@jokester/ts-commonutil": "^0.6.0",
     "debug": "^4.3.7",
-    "hono": "^4.5.11",
     "engine.io": "workspace:*",
-    "socket.io-adapter": "workspace:*",
-    "socket.io": "workspace:*"
+    "hono": "^4.5.11",
+    "socket.io": "workspace:*",
+    "socket.io-adapter": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240903.0",
     "@tsconfig/strictest": "^2.0.5",
     "@types/debug": "^4.1.12",
     "@types/ws": "^8",
+    "esbuild": "^0.24.0",
     "typescript": "^5.6"
   }
 }

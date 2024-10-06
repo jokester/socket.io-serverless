@@ -1,7 +1,7 @@
 import debugModule from 'debug'
 import type * as CF from '@cloudflare/workers-types';
 import {EioSocketState} from "./EngineActorBase";
-import {SocketActor} from "../sio/SocketActor";
+import type {SocketActorBase} from "../sio/SocketActorBase";
 import {EioSocket} from "./EioSocket";
 import {WebsocketTransport} from "./WebsocketTransport";
 
@@ -14,7 +14,7 @@ export interface EngineDelegate {
     /**
      * extension point for load-balancing
      */
-    getSocketActorStub(sessionId: string): CF.DurableObjectStub<SocketActor>
+    getSocketActorStub(sessionId: string): CF.DurableObjectStub<SocketActorBase>
     // called on outgoing client messages
     recallSocketStateForId(eioSocketId: string): null | EioSocketState;
     // called on incoming client messages
@@ -24,18 +24,19 @@ export interface EngineDelegate {
 }
 
 export class DefaultEngineDelegate implements EngineDelegate {
+
     private readonly _liveConnections = new Map<string, EioSocket>()
 
-    constructor(private readonly _ctx: CF.DurableObjectState, private readonly socketActorNs: CF.DurableObjectNamespace<SocketActor>) {
+    constructor(private readonly eioActorState: CF.DurableObjectState, private readonly sioActorNs: CF.DurableObjectNamespace<SocketActorBase>) {
     }
 
     /**
-     * @note this can be overridden for load-balancing
+     * @note in future this can be overridden for load-balancing
      */
     getSocketActorStub(sessionId: string):
     // @ts-expect-error
-        CF.DurableObjectStub<SocketActor> {
-        const ns = this.socketActorNs;
+        CF.DurableObjectStub<SocketActorBase> {
+        const ns = this.sioActorNs;
         const addr = ns.idFromName('singleton')
         return ns.get(addr)
     }
@@ -44,13 +45,13 @@ export class DefaultEngineDelegate implements EngineDelegate {
         const socketActorStub = this.getSocketActorStub(eioSocketId)
         return {
             eioSocketId,
-            eioActorId: this._ctx.id,
+            eioActorId: this.eioActorState.id,
             socketActorStub,
         }
     }
 
     recallSocketStateForConn(ws: CF.WebSocket): null | EioSocketState {
-        const tags = this._ctx.getTags(ws)
+        const tags = this.eioActorState.getTags(ws)
         debugLogger('recallSocketStateForConn', ws, tags)
         const sessionTag = tags.find(tag => tag.startsWith('sid:'))
         if (!sessionTag) {
@@ -61,7 +62,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
 
         return {
             eioSocketId,
-            eioActorId: this._ctx.id,
+            eioActorId: this.eioActorState.id,
             socketActorStub: this.getSocketActorStub(eioSocketId)
         }
     }
@@ -80,14 +81,14 @@ export class DefaultEngineDelegate implements EngineDelegate {
         }
         const tag = `sid:${state.eioSocketId}`
 
-        const ws = this._ctx.getWebSockets(tag)
+        const ws = this.eioActorState.getWebSockets(tag)
         if (ws.length !== 1) {
             debugLogger(`WARNING no websocket found for tag: ${JSON.stringify(tag)}`, ws.length)
 
-            const wss = this._ctx.getWebSockets()
+            const wss = this.eioActorState.getWebSockets()
             debugLogger(`DEBUG cf websockets`, wss.length)
             for (const w of wss) {
-                debugLogger(`DEBUG cf ws`, this._ctx.getTags(w))
+                debugLogger(`DEBUG cf ws`, this.eioActorState.getTags(w))
             }
             return null
         }

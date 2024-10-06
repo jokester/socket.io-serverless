@@ -26,6 +26,7 @@ export class SioServer extends OrigSioServer {
 
         super(undefined, {
             ...options,
+            adapter: options.adapter!,
             transports: ['websocket'],
             allowEIO3: false,
             serveClient: false,

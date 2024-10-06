@@ -6,12 +6,15 @@ import {SioServer} from './SioServer'
 import {EioSocketStub} from "./EioSocketStub";
 import {lazyThenable} from "@jokester/ts-commonutil/lib/concurrency/lazy-thenable";
 import {createSioServer} from "./factory";
+import { EngineActorBase } from '../eio/EngineActorBase';
+import { DurableObjectProps } from '../../utils/do';
 
-const debugLogger = debug('sio-serverless:SocketActor');
+const debugLogger = debug('sio-serverless:sio:SocketActor');
 
-export class SocketActor<WorkerBindings> extends DurableObject<WorkerBindings> implements CF.DurableObject {
+// @ts-expect-error
+export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject, DurableObjectProps<Bindings> {
 
-    fetch(req: CF.Request) {
+    fetch(req: CF.Request): Promise<never> {
         throw new Error('Method not implemented.');
     }
 
@@ -40,6 +43,8 @@ export class SocketActor<WorkerBindings> extends DurableObject<WorkerBindings> i
         sioServer.onEioError(socketId, error)
     }
 
+    abstract get engineActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<EngineActorBase>;
+
     /**
      * extension point
      */
@@ -48,7 +53,7 @@ export class SocketActor<WorkerBindings> extends DurableObject<WorkerBindings> i
     }
 
     private readonly sioServer = lazyThenable(async () => {
-        const s = await createSioServer(this.ctx, this.env.engineActor)
+        const s = await createSioServer(this.ctx, this.engineActorNamespace)
         await this.onServerCreated(s)
         await s.restoreState()
         s.startPersisting()

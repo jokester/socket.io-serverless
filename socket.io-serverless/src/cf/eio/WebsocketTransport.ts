@@ -1,8 +1,6 @@
 import {WebSocketStub} from "./WebSocketStub";
 import type * as CF from "@cloudflare/workers-types";
-// @ts-ignore
-import type * as eio from 'enging.io/lib/engine.io'
-// @ts-ignore
+import type * as eio from 'engine.io/lib/engine.io'
 import {WebSocket as EioWebSocketTransport} from 'engine.io/lib/transports/websocket';
 import debugModule from 'debug';
 import type {WebSocket as WsWebSocket} from "ws";
@@ -13,7 +11,6 @@ function createStubRequest(
     websocket: WsWebSocket
 ): eio.EngineRequest {
     return {
-        // @ts-expect-error
         _query: {
             sid: 'TODO',
             EIO: '4',
