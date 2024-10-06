@@ -1,12 +1,11 @@
 // @ts-ignore
-import type {Namespace} from 'socket.io/lib/index';
-import {Server as OrigSioServer, Socket} from 'socket.io/lib/index';
+import {Server as OrigSioServer, Socket, Namespace} from 'socket.io/lib/index';
 import type * as CF from "@cloudflare/workers-types";
 import debugModule from "debug";
 import {EioSocketStub} from "./EioSocketStub";
 import {SioClient} from "./SioClient";
 import {EngineActorBase} from "../eio/EngineActorBase";
-import type * as sio from 'socket.io'
+import type * as sio from 'socket.io/lib'
 import {Persister} from "./Persister";
 
 const debugLogger = debugModule('sio-serverless:sio:SioServer');
