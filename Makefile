@@ -1,3 +1,11 @@
-socket.io-dist:
-	pnpm run --filter ./socket.io/packages/'engine.io*' compile
-	pnpm run --filter ./socket.io/packages/'socket.io' compile
+lib:
+	cd socket.io-serverless && node build.mjs
+
+lib-watch:
+	cd socket.io-serverless && node build.mjs --watch
+
+run-demo-client:
+	pnpm run --filter ./demo-client dev
+
+run-demo-server:
+	pnpm run --filter ./demo-server dev:cf

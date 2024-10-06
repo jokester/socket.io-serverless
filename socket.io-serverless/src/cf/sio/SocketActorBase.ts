@@ -1,18 +1,21 @@
 import type * as CF from '@cloudflare/workers-types';
 // @ts-expect-error
-import {DurableObject} from "cloudflare:workers";
+import { DurableObject } from "cloudflare:workers";
 import debug from 'debug'
-import {SioServer} from './SioServer'
-import {EioSocketStub} from "./EioSocketStub";
-import {lazyThenable} from "@jokester/ts-commonutil/lib/concurrency/lazy-thenable";
-import {createSioServer} from "./factory";
+import { SioServer } from './SioServer'
+import { EioSocketStub } from "./EioSocketStub";
+import { lazyThenable } from "@jokester/ts-commonutil/lib/concurrency/lazy-thenable";
 import { EngineActorBase } from '../eio/EngineActorBase';
-import { DurableObjectProps } from '../../utils/do';
+import { Persister } from './Persister';
+import { SingleActorAdapter } from './SingleActorAdapter';
 
 const debugLogger = debug('sio-serverless:sio:SocketActor');
 
-// @ts-expect-error
-export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject, DurableObjectProps<Bindings> {
+export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject {
+
+    constructor(readonly state: CF.DurableObjectState, readonly env: Bindings) {
+        super(state, env)
+    }
 
     fetch(req: CF.Request): Promise<never> {
         throw new Error('Method not implemented.');
@@ -53,7 +56,7 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
     }
 
     private readonly sioServer = lazyThenable(async () => {
-        const s = await createSioServer(this.ctx, this.engineActorNamespace)
+        const s = await createSioServer(this.state, this.getEngineActorNamespace(this.env))
         await this.onServerCreated(s)
         await s.restoreState()
         s.startPersisting()
@@ -61,3 +64,18 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
     })
 }
 
+async function createSioServer(ctx: CF.DurableObjectState, engineActorNs: CF.DurableObjectNamespace<EngineActorBase>): Promise<SioServer> {
+    const persister = new Persister(ctx)
+    /**
+     * adapter class should exist per DO
+     */
+    class BoundAdapter extends SingleActorAdapter {
+        override get persister() {
+            return persister
+        }
+    }
+    return new SioServer(
+        {
+            adapter: BoundAdapter,
+        }, ctx, engineActorNs, persister)
+}

@@ -3,26 +3,35 @@ import { createEioActor, createSioActor } from "socket.io-serverless/dist/cf.js"
 import {Hono} from 'hono';
 import type {DurableObjectNamespace} from '@cloudflare/workers-types';
 import debugModule from 'debug'
+import type {Server} from 'socket.io/lib'
 // export { EngineActor } from "../../../socket.io-serverless/src/cf/EngineActor";
 // export { SocketActor } from "../../../socket.io-serverless/src/cf/SocketActor";
 
 const debugLogger = debugModule('socket.io-serverless:demo:cf-main');
 
 export const EngineActor = createEioActor<WorkerBindings>({
-    getSocketActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<SocketActorBase> {
+    getSocketActorNamespace(bindings) {
         return bindings.socketActor;
     }
 });
 
-export const SocketActor = createSioActor({ async onServerCreated(s) {
-                console.debug('sio.Server created')
-        // XXX how to support such use with re-created nsps / sockets?
-        s.of(forwardEverything.parentNamespace)
-            .on('connection', (socket) => {
-                console.debug('sio.Socket created', socket.nsp.name, socket.id)
-                forwardEverything.onConnection(socket);
-            });
-} });
+async function onServerCreated(s: Server) {
+    console.debug('sio.Server created')
+    // XXX how to support such use with re-created nsps / sockets?
+    s.of(forwardEverything.parentNamespace)
+        .on('connection', (socket) => {
+            console.debug('sio.Socket created', socket.nsp.name, socket.id)
+            forwardEverything.onConnection(socket);
+        });
+
+}
+
+export const SocketActor = createSioActor({
+    onServerCreated,
+    getEngineActorNamespace(bindings) {
+        return bindings.engineActor;
+    },
+});
 
 export interface WorkerBindings extends Record<string, unknown> {
     // @ts-ignore

@@ -4,6 +4,7 @@ import type * as CF from "@cloudflare/workers-types";
 import { EngineActorBase } from "./eio/EngineActorBase";
 import { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { SocketActorBase } from "./sio/SocketActorBase";
+import { SioServer } from "./sio/SioServer";
 
 export const createEioActor: typeof exported.createEioActor = function <
   Bindings,
@@ -21,6 +22,9 @@ export const createSioActor: typeof exported.createSioActor = function <
   Bindings,
 >(options: exported.SioActorOptions) {
   return class SioActor extends SocketActorBase<Bindings> {
+    override async onServerCreated(s: SioServer): Promise<void> {
+      await options.onServerCreated?.(s);
+    }
     getEngineActorNamespace(
       bindings: Bindings,
     ): CF.DurableObjectNamespace<EngineActorBase> {
