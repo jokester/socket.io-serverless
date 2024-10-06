@@ -79,7 +79,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
             eioSocketId,
             socketActorStub: sioActorStub,
         }
-        const created = new EioSocket(socketState, transport);
+        const created = new EioSocket(socketState, transport, false);
 
         // @ts-ignore
         await sioActorStub.onEioSocketConnection(socketState.eioActorId, eioSocketId)
@@ -112,10 +112,10 @@ export class DefaultEngineDelegate implements EngineDelegate {
             return null
         }
         const transport = WebsocketTransport.create(ws[0]!)
-        const revived = new EioSocket(state, transport)
+        const revived = new EioSocket(state, transport, true)
         revived.setupOutgoingEvents(state)
         this._liveConnections.set(state.eioSocketId, revived);
-        debugLogger('revived eio.Socket', state.eioSocketId)
+        debugLogger('revived EioSocket', state.eioSocketId)
         return revived
     }
 }

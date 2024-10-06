@@ -28,8 +28,17 @@ function createStubEioServer() {
  * - close
  */
 export class EioSocket extends Socket {
-    constructor(private readonly socketState: EioSocketState, private readonly _transport: WebsocketTransport) {
+    constructor(private readonly socketState: EioSocketState, private readonly _transport: WebsocketTransport, private readonly _isRevivedSocket: boolean) {
         super(socketState.eioSocketId, createStubEioServer() as any, _transport, null!, 4);
+        if (_isRevivedSocket) {
+            // FIXME need a way to monkey hack this at right timing
+            // @ts-expect-error
+            this.onOpen = () => {
+                // when this is revived, monkey patch the method
+                // to not send 'open' package and initial server message
+                this.readyState = "open";
+            }
+        }
         debugLogger('EioSocket created', socketState)
     }
 
