@@ -1,9 +1,7 @@
 {
   "name": "socket.io-serverless",
   "description": "A custom socket.io build to run in Cloudflare workers.",
-  "$$exports": {
-    "development": "./src/index.ts"
-  },
+  "type": "module",
   "dependencies": {
     "@jokester/ts-commonutil": "^0.6.0",
     "base64id": "^2.0.0",

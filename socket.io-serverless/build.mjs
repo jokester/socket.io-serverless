@@ -53,6 +53,25 @@ async function findPackageDir2(pkgName) {
 }
 
 /**
+ * @type {esbuild.Plugin}
+ */
+const renameNodeStdlibImports = {
+  name: 'renameNodeStdlibImports',
+  setup(build) {
+    build.onResolve({filter: /^crypto$/}, async (args) => {
+      console.debug('renameNodeStdlibImports', args)
+      // return {path: 'node:crypto', external: true}
+      return {path: path.join(mocksRoot, 'node_crypto.mjs')}
+    })
+    build.onResolve({filter: /^url$/}, async (args) => {
+      console.debug('renameNodeStdlibImports', args)
+      // return {path: 'node:url', external: true}
+      return {path: path.join(mocksRoot, 'node_url.mjs')}
+    })
+
+  }
+}
+/**
  * rewire import of socket.io files, to bypass export map and import TS directly
  * @type {esbuild.Plugin}
  */
@@ -60,9 +79,9 @@ const rewireSocketIoImports = {
   name: "rewireSocketIoPackages",
   setup(build) {
     const packageImportMap = {
-      // 'base64id': path.join(sioServerlessRoot, 'mocks/base64id/index.mjs'),
+      // 'base64id': path.join(sioServerlessRoot, 'node_modules/base64id/index.mjs'),
       "socket.io": path.join(sioPackagesRoot, "socket.io/lib/index.ts"),
-      // "base64id": path.join(sioPackagesRoot, "engine.io/node_modules/base64id/lib/base64id.js"),
+      "base64id": path.join(sioPackagesRoot, "engine.io/node_modules/base64id/lib/base64id.js"),
       "engine.io": path.join(sioPackagesRoot, "engine.io/lib/engine.io.ts"),
       // './polling': path.join(mocksRoot, 'empty.js'),
       // './polling-jsonp': path.join(mocksRoot, 'empty.js'),
@@ -174,7 +193,8 @@ const cfBuildContext = {
   entryPoints: ["src/cf/index.ts"],
   bundle: true,
   platform: "neutral",
-  // target: "es2022",
+  // target: "esnext",
+  format: "esm",
   metafile: true,
   outfile: "dist/cf.js",
   // sourcemap: true,
@@ -184,14 +204,17 @@ const cfBuildContext = {
     "debug",
     "timers",
     "url",
+    "node:url",
     "zlib",
     "stream",
     "crypto",
+    "node:crypto",
     "querystring",
     'base64id', //let wrangler bundle it */
   ],
   plugins: [
     rewireSocketIoImports,
+    renameNodeStdlibImports,
     buildRewirePlugin([
       "debug",
       "http",
