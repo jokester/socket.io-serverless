@@ -4,6 +4,5 @@
     "noEmit": true,
     "noUnusedParameters": false,
     "noUnusedLocals": false,
-    "moduleResolution": "bundler"
   }
 }

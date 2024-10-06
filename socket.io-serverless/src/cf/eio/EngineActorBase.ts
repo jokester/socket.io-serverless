@@ -5,7 +5,7 @@ import type * as CF from '@cloudflare/workers-types';
 import {DurableObject} from "cloudflare:workers";
 import {Hono} from "hono";
 import {lazy} from "../../utils/lazy";
-import {DefaultEngineDelegate, EngineDelegate} from "./EngineDelegate";
+import { DefaultEngineDelegate, EngineDelegate } from './EngineDelegate';
 import {SocketActorBase} from "../sio/SocketActorBase";
 import {EioSocket} from "./EioSocket";
 import {WebsocketTransport} from "./WebsocketTransport";
@@ -23,6 +23,7 @@ export interface EioSocketState {
     eioSocketId: string
     // @ts-expect-error
     socketActorStub: CF.DurableObjectStub<SocketActorBase<unknown>>
+    ws?: CF.WebSocket
 }
 
 export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject{
@@ -42,7 +43,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
     webSocketMessage(ws: CF.WebSocket, message: string | ArrayBuffer){
         debugLogger('EngineActor#webSocketMessage', message)
         const socketState = this.delegate.recallSocketStateForConn(ws)
-        const socket = socketState && this.delegate.recallSocket(socketState)
+        const socket = socketState && this.delegate.reviveEioSocket(socketState)
         debugLogger('EngineActor#webSocketMessage', socketState?.eioSocketId, socket?.constructor)
         socket?.onCfMessage(message as string)
     }
@@ -50,7 +51,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
     webSocketClose(ws: CF.WebSocket, code: number, reason: string, wasClean: boolean) {
         debugLogger('EngineActor#webSocketClose',code, reason, wasClean)
         const socketState = this.delegate.recallSocketStateForConn(ws)
-        const socket = socketState && this.delegate.recallSocket(socketState)
+        const socket = socketState && this.delegate.reviveEioSocket(socketState)
         debugLogger('EngineActor#webSocketClose',socketState?.eioSocketId, socket?.constructor)
         socket?.onCfClose(code, reason, wasClean)
     }
@@ -58,7 +59,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
     webSocketError(ws: CF.WebSocket, error: unknown) {
         debugLogger('EngineActor#webSocketError', error)
         const socketState = this.delegate.recallSocketStateForConn(ws)
-        const socket = socketState && this.delegate.recallSocket(socketState)
+        const socket = socketState && this.delegate.reviveEioSocket(socketState)
         debugLogger('EngineActor#webSocketError', socketState?.eioSocketId, socket?.constructor)
         socket?.onCfError(String(error))
     }
@@ -69,7 +70,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
      */
     async sendMessage(eioSocketId: string, message: string | Buffer): Promise<boolean> {
         const socketState = this.delegate.recallSocketStateForId(eioSocketId)
-        const socket = socketState && this.delegate.recallSocket(socketState)
+        const socket = socketState && this.delegate.reviveEioSocket(socketState)
         if (!socket) {
             debugLogger('EngineActor#sendMessage', 'socket not found', eioSocketId)
             return false
@@ -88,32 +89,11 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         return this.honoApp.value.fetch(request)
     }
 
-    async onNewConnection(eioSocketId: string, serverSocket: CF.WebSocket): Promise<{state: EioSocketState, socket: EioSocket}> {
-        const transport = WebsocketTransport.create(serverSocket);
-        const sioActorStub = this.delegate.getSocketActorStub(eioSocketId)
-        const socketState: EioSocketState = {
-            eioActorId: this.state.id,
-            eioSocketId,
-            socketActorStub: sioActorStub,
-        }
-        const eioSocket = new EioSocket(socketState, transport);
-
-        // @ts-ignore
-        await sioActorStub.onEioSocketConnection(socketState.eioActorId, eioSocketId)
-        eioSocket.setupOutgoingEvents(socketState)
-        this.delegate.onNewSocket(eioSocketId, eioSocket)
-        debugLogger('created new CustomEioSocket', eioSocketId)
-
-        return {
-            state: socketState, socket: eioSocket
-        }
-    }
-
-    private readonly honoApp = lazy(() => createHandler(this))
+    private readonly honoApp = lazy(() => createHandler(this, this.delegate))
 }
 
 // FIXME: drop hono for plain JS
-function createHandler(actor: EngineActorBase) {
+function createHandler(actor: EngineActorBase, delegate: EngineDelegate) {
     return new Hono()
         // @ts-ignore hono.Response is not CF.Response
         .get('/socket.io/*', async ctx => {
@@ -140,7 +120,7 @@ function createHandler(actor: EngineActorBase) {
             const tags = [`sid:${sid}`];
             actor.state.acceptWebSocket(serverSocket, tags);
             debugLogger('accepted ws connection', sid, tags);
-            await actor.onNewConnection(sid, serverSocket)
+            await delegate.createEioSocket(sid, serverSocket)
             return new self.Response(null, {status: 101, webSocket: clientSocket});
         })
 }

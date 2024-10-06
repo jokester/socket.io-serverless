@@ -1,15 +1,14 @@
 import * as forwardEverything from "../app/forward-everything";
-import { createEioActor, createSioActor } from "socket.io-serverless/dist/cf.js";
+import { createEioActor, createSioActor, createDebugLogger, setEnabledLoggerNamespace } from "socket.io-serverless/dist/cf.js";
 import { Hono } from 'hono';
 import type { DurableObjectNamespace } from '@cloudflare/workers-types';
-import debugModule from 'debug'
 import type { Server } from 'socket.io/lib'
 // export { EngineActor } from "../../../socket.io-serverless/src/cf/EngineActor";
 // export { SocketActor } from "../../../socket.io-serverless/src/cf/SocketActor";
 
-const debugLogger = debugModule('socket.io-serverless:demo:cf-main');
+const debugLogger = createDebugLogger('socket.io-serverless:demo:cf-main');
 
-debugModule.enable('engine.io,socket.io')
+setEnabledLoggerNamespace(['engine:', 'socket.io:', 'sio-serverless:eio:']);
 
 export const EngineActor = createEioActor<WorkerBindings>({
     getSocketActorNamespace(bindings: WorkerBindings) {

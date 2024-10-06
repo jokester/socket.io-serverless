@@ -21,8 +21,8 @@ export interface EngineDelegate {
     recallSocketStateForId(eioSocketId: string): null | EioSocketState;
     // called on incoming client messages
     recallSocketStateForConn(ws: CF.WebSocket): null | EioSocketState
-    recallSocket(state: EioSocketState): null | EioSocket;
-    onNewSocket(eioSocketId: string, socket: EioSocket): void
+    createEioSocket(eioSocketId: string, serverSocket: CF.WebSocket): Promise<EioSocket>
+    reviveEioSocket(state: EioSocketState): null | EioSocket
 }
 
 export class DefaultEngineDelegate implements EngineDelegate {
@@ -71,12 +71,27 @@ export class DefaultEngineDelegate implements EngineDelegate {
         }
     }
 
-    onNewSocket(eioSocketId: string, socket: EioSocket) {
-        this._liveConnections.set(eioSocketId, socket)
+    async createEioSocket(eioSocketId: string, serverSocket: CF.WebSocket): Promise<EioSocket> {
+        const transport = WebsocketTransport.create(serverSocket);
+        const sioActorStub = this.getSocketActorStub(eioSocketId)
+        const socketState: EioSocketState = {
+            eioActorId: this.eioActorState.id,
+            eioSocketId,
+            socketActorStub: sioActorStub,
+        }
+        const created = new EioSocket(socketState, transport);
+
+        // @ts-ignore
+        await sioActorStub.onEioSocketConnection(socketState.eioActorId, eioSocketId)
+        created.setupOutgoingEvents(socketState)
+        this._liveConnections.set(eioSocketId, created)
+        debugLogger('created new EioSocket', eioSocketId)
+        return created;
     }
 
-    recallSocket(state: EioSocketState): null | EioSocket {
+    reviveEioSocket(state: EioSocketState): null | EioSocket {
         {
+            // if already revived in this DO life, use that instance
             const alive = this._liveConnections.get(state.eioSocketId)
             if (alive) {
                 debugLogger('found alive eio.Socket for sid', state.eioSocketId)
@@ -99,7 +114,8 @@ export class DefaultEngineDelegate implements EngineDelegate {
         const transport = WebsocketTransport.create(ws[0]!)
         const revived = new EioSocket(state, transport)
         revived.setupOutgoingEvents(state)
-        debugLogger('revived eio.Socket for sid', state.eioSocketId)
+        this._liveConnections.set(state.eioSocketId, revived);
+        debugLogger('revived eio.Socket', state.eioSocketId)
         return revived
     }
 }

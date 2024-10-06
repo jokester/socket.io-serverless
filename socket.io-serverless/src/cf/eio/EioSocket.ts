@@ -30,6 +30,7 @@ function createStubEioServer() {
 export class EioSocket extends Socket {
     constructor(private readonly socketState: EioSocketState, private readonly _transport: WebsocketTransport) {
         super(socketState.eioSocketId, createStubEioServer() as any, _transport, null!, 4);
+        debugLogger('EioSocket created', socketState)
     }
 
     setupOutgoingEvents(

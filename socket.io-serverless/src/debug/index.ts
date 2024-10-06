@@ -5,7 +5,7 @@ let enabledNamespaces = new DefaultMap<string, boolean>((namespace) => false)
 export function createDebugLogger(namespace: string) {
     return (...args: any[]) => {
         if (enabledNamespaces.getOrCreate(namespace)) {
-            console.debug(new Date(), ...args)
+            console.debug(new Date(), namespace, ...args)
         }
 
     }
