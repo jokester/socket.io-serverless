@@ -1,12 +1,13 @@
 {
   "name": "@jokester/socket.io-serverless-monorepo",
   "description": "run socket.io server in Cloudflare workers.",
+  "version": "0.1.0",
   "private": true,
-  "packageManager": "yarn@4.2.2",
-  "workspaces": [
-    "./demo-client",
-    "./demo-server",
-    "./socket.io-serverless",
-    "./socket.io/packages/*"
-  ]
+  "packageManager": "pnpm",
+  "devDependencies": {
+    "rimraf": "^6",
+    "typescript": "^5.6",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.4.0",
+    "@types/node": "^20"
+  }
 }

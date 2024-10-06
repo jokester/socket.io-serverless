@@ -1,7 +1,6 @@
 // @ts-ignore
 import type {Namespace} from 'socket.io/lib/index';
-// @ts-expect-error
-import {Server as OrigSioServer, Socket} from 'socket.io';
+import {Server as OrigSioServer, Socket} from 'socket.io/lib';
 import type * as CF from "@cloudflare/workers-types";
 import debugModule from "debug";
 import {EioSocketStub} from "./EioSocketStub";

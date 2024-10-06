@@ -4,7 +4,7 @@ import type * as CF from '@cloudflare/workers-types';
 // @ts-expect-error
 import {DurableObject} from "cloudflare:workers";
 import {Hono} from "hono";
-import {lazy} from "@jokester/socket.io-serverless/src/utils/lazy";
+import {lazy} from "socket.io-serverless/src/utils/lazy";
 import {EngineDelegate} from "./EngineDelegate";
 import {SocketActor} from "../SocketActor";
 import {EioSocket} from "./EioSocket";
@@ -21,7 +21,6 @@ declare const self: CF.ServiceWorkerGlobalScope;
 export interface EioSocketState {
     eioActorId: CF.DurableObjectId,
     eioSocketId: string
-    // @ts-expect-error
     socketActorStub: CF.DurableObjectStub<SocketActor>
 }
 

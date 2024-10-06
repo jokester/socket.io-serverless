@@ -1,0 +1,6 @@
+packages: [
+  "./demo-client",
+  "./demo-server",
+  "./socket.io-serverless",
+  "./socket.io/packages/*"
+]
