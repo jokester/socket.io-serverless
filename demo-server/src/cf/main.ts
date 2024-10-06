@@ -1,5 +1,5 @@
 import * as forwardEverything from "../app/forward-everything";
-import { createEioActor, createSioActor } from "socket.io-serverless/src";
+import { createEioActor, createSioActor } from "socket.io-serverless/dist/cf.js";
 import {Hono} from 'hono';
 import type {DurableObjectNamespace} from '@cloudflare/workers-types';
 import debugModule from 'debug'
@@ -8,9 +8,13 @@ import debugModule from 'debug'
 
 const debugLogger = debugModule('socket.io-serverless:demo:cf-main');
 
-export const EioActor = createEioActor<WorkerBindings>({});
+export const EngineActor = createEioActor<WorkerBindings>({
+    getSocketActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<SocketActorBase> {
+        return bindings.socketActor;
+    }
+});
 
-export const SioActor = createSioActor({ async onServerCreated(s) {
+export const SocketActor = createSioActor({ async onServerCreated(s) {
                 console.debug('sio.Server created')
         // XXX how to support such use with re-created nsps / sockets?
         s.of(forwardEverything.parentNamespace)

@@ -124,7 +124,7 @@ importers:
         specifier: workspace:*
         version: link:../socket.io/packages/engine.io
       hono:
-        specifier: ^4.5.11
+        specifier: ^4.6.3
         version: 4.6.3
       socket.io:
         specifier: workspace:*
@@ -134,7 +134,7 @@ importers:
         version: link:../socket.io-serverless
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20240903.0
+        specifier: ^4.20241004.0
         version: 4.20241004.0
       '@tsconfig/strictest':
         specifier: ^2.0.5
@@ -143,10 +143,10 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
       '@types/node':
-        specifier: ^20
+        specifier: ^20.16.10
         version: 20.16.10
       '@types/ws':
-        specifier: ^8
+        specifier: ^8.5.12
         version: 8.5.12
       base64id:
         specifier: ^2.0.0
@@ -166,6 +166,9 @@ importers:
       '@jokester/ts-commonutil':
         specifier: ^0.6.0
         version: 0.6.0
+      base64id:
+        specifier: ^2.0.0
+        version: 2.0.0
       debug:
         specifier: ^4.3.7
         version: 4.3.7
@@ -188,6 +191,9 @@ importers:
       '@tsconfig/strictest':
         specifier: ^2.0.5
         version: 2.0.5
+      '@types/base64id':
+        specifier: ^2.0.2
+        version: 2.0.2
       '@types/debug':
         specifier: ^4.1.12
         version: 4.1.12
@@ -234,24 +240,6 @@ importers:
         specifier: ~8.17.1
         version: 8.17.1
 
-  socket.io/packages/engine.io-client:
-    dependencies:
-      '@socket.io/component-emitter':
-        specifier: ~3.1.0
-        version: 3.1.2
-      debug:
-        specifier: ~4.3.1
-        version: 4.3.7
-      engine.io-parser:
-        specifier: ~5.2.1
-        version: 5.2.3
-      ws:
-        specifier: ~8.17.1
-        version: 8.17.1
-      xmlhttprequest-ssl:
-        specifier: ~2.1.1
-        version: 2.1.1
-
   socket.io/packages/engine.io-parser: {}
 
   socket.io/packages/socket.io:
@@ -286,38 +274,6 @@ importers:
       ws:
         specifier: ~8.17.1
         version: 8.17.1
-
-  socket.io/packages/socket.io-client:
-    dependencies:
-      '@socket.io/component-emitter':
-        specifier: ~3.1.0
-        version: 3.1.2
-      debug:
-        specifier: ~4.3.2
-        version: 4.3.7
-      engine.io-client:
-        specifier: ~6.6.1
-        version: 6.6.1
-      socket.io-parser:
-        specifier: ~4.2.4
-        version: 4.2.4
-
-  socket.io/packages/socket.io-cluster-engine:
-    dependencies:
-      '@msgpack/msgpack':
-        specifier: ~2.8.0
-        version: 2.8.0
-      debug:
-        specifier: ~4.3.3
-        version: 4.3.7
-      engine.io:
-        specifier: ~6.6.0
-        version: 6.6.1
-      engine.io-parser:
-        specifier: ~5.2.3
-        version: 5.2.3
-
-  socket.io/packages/socket.io-component-emitter: {}
 
   socket.io/packages/socket.io-parser:
     dependencies:
@@ -1140,10 +1096,6 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@msgpack/msgpack@2.8.0':
-    resolution: {integrity: sha512-h9u4u/jiIRKbq25PM+zymTyW6bhTzELvOoUd+AvYriWOAKpLGnIamaET3pnHYoI5iYphAHBI4ayx0MehR+VVPQ==}
-    engines: {node: '>= 10'}
-
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -1279,6 +1231,9 @@ packages:
 
   '@tsconfig/strictest@2.0.5':
     resolution: {integrity: sha512-ec4tjL2Rr0pkZ5hww65c+EEPYwxOi4Ryv+0MtjeaSQRJyq322Q27eOQiFbuNgw2hpL4hB1/W/HBGk3VKS43osg==}
+
+  '@types/base64id@2.0.2':
+    resolution: {integrity: sha512-L/KwKcOKG3PPFXBsXJnBsvPKn5LxOpL7eO1Fwq4il1iGiMNYbEapPVqOONPMzxB08WUJOLWcLHL7y8kLUgDp2Q==}
 
   '@types/cookie@0.4.1':
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
@@ -3699,8 +3654,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@msgpack/msgpack@2.8.0': {}
-
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -3816,6 +3769,10 @@ snapshots:
   '@socket.io/component-emitter@3.1.2': {}
 
   '@tsconfig/strictest@2.0.5': {}
+
+  '@types/base64id@2.0.2':
+    dependencies:
+      '@types/node': 20.16.10
 
   '@types/cookie@0.4.1': {}
 

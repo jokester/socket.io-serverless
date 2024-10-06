@@ -5,7 +5,6 @@
   "description": "a simple socket.io server",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node build-node.mjs",
     "lint": "gts lint",
     "clean": "gts clean",
     "dev:cf": "DEBUG=limb:*,-socket.io:* wrangler dev",
@@ -19,16 +18,16 @@
     "@jokester/ts-commonutil": "^0.6.0",
     "debug": "^4.3.7",
     "engine.io": "workspace:*",
-    "hono": "^4.5.11",
+    "hono": "^4.6.3",
     "socket.io": "workspace:*",
     "socket.io-serverless": "workspace:^"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240903.0",
+    "@cloudflare/workers-types": "^4.20241004.0",
     "@tsconfig/strictest": "^2.0.5",
     "@types/debug": "^4.1.12",
-    "@types/node": "^20",
-    "@types/ws": "^8",
+    "@types/node": "^20.16.10",
+    "@types/ws": "^8.5.12",
     "base64id": "^2.0.0",
     "tsx": "*",
     "typescript": "*",

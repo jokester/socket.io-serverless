@@ -1,6 +1,9 @@
-packages: [
-  "./demo-client",
-  "./demo-server",
-  "./socket.io-serverless",
-  "./socket.io/packages/*"
-]
+packages:
+- ./demo-client
+- ./demo-server
+- ./socket.io-serverless
+- ./socket.io/packages/engine.io
+- ./socket.io/packages/engine.io-parser
+- ./socket.io/packages/socket.io
+- ./socket.io/packages/socket.io-parser
+- ./socket.io/packages/socket.io-adapter
