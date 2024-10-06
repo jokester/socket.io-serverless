@@ -1,26 +1,26 @@
 import {WebSocketStub} from "./WebSocketStub";
 import type * as CF from "@cloudflare/workers-types";
-import type * as eio from 'engine.io/lib/engine.io'
+import type { EngineRequest } from "engine.io/lib/transport";
 import {WebSocket as EioWebSocketTransport} from 'engine.io/lib/transports/websocket';
-import debugModule from 'debug';
+import debugModule from '../../debug'
 import type {WebSocket as WsWebSocket} from "ws";
 
 const debugLogger = debugModule('sio-serverless:eio:CustomEioWebsocketTransport');
 
 function createStubRequest(
     websocket: WsWebSocket
-): eio.EngineRequest {
+): EngineRequest {
     return {
         _query: {
             sid: 'TODO',
             EIO: '4',
         },
         websocket,
-    };
+    } as any;
 }
 
 export class WebsocketTransport extends EioWebSocketTransport {
-    constructor(readonly _stubWs: WebSocketStub, stubReq: eio.EngineRequest) {
+    constructor(readonly _stubWs: WebSocketStub, stubReq: EngineRequest) {
         super(stubReq);
     }
 

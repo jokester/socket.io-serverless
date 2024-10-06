@@ -163,6 +163,7 @@ function buildRewirePlugin(imports) {
   const serverlessRewireMap = {
     // debug: path.join(mocksRoot, "debug/index.js"),
     ws: path.join(mocksRoot, "ws/index.js"),
+    debug: path.join(___dirname, 'src/debug/index.ts'),
     accepts: path.join(mocksRoot, "empty.js"),
     path: path.join(mocksRoot, "empty.js"),
     fs: path.join(mocksRoot, "empty.js"),
@@ -217,7 +218,7 @@ const cfBuildContext = {
   external: [
     "cloudflare:workers",
     "events",
-    "debug",
+    // "debug",
     "timers",
     "url",
     "node:url",
