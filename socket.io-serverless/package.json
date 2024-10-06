@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@jokester/ts-commonutil": "^0.6.0",
+    "base64id": "^2.0.0",
     "debug": "^4.3.7",
     "engine.io": "workspace:*",
     "hono": "^4.5.11",
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240903.0",
     "@tsconfig/strictest": "^2.0.5",
+    "@types/base64id": "^2.0.2",
     "@types/debug": "^4.1.12",
     "@types/ws": "^8",
     "esbuild": "^0.24.0",

@@ -43,7 +43,7 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
         sioServer.onEioError(socketId, error)
     }
 
-    abstract get engineActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<EngineActorBase>;
+    abstract getEngineActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<EngineActorBase>;
 
     /**
      * extension point

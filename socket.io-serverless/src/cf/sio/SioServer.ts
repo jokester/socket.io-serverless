@@ -1,6 +1,6 @@
 // @ts-ignore
 import type {Namespace} from 'socket.io/lib/index';
-import {Server as OrigSioServer, Socket} from 'socket.io/lib';
+import {Server as OrigSioServer, Socket} from 'socket.io/lib/index';
 import type * as CF from "@cloudflare/workers-types";
 import debugModule from "debug";
 import {EioSocketStub} from "./EioSocketStub";
