@@ -1,10 +1,9 @@
 import type * as CF from '@cloudflare/workers-types';
 import debug from 'debug'
 import {DefaultEngineDelegate, EngineDelegate} from "./eio/EngineDelegate";
-import {SocketActor} from "./SocketActor";
+import {SocketActor} from "./sio/SocketActor";
 import {EioSocketState, EngineActorBase} from "./eio/EngineActorBase";
 import {EioSocket} from "./eio/EioSocket";
-import {WorkerBindings} from "./workerApp";
 
 const debugLogger = debug('sio-serverless:EngineActor');
 

@@ -3,7 +3,7 @@ import type * as eio from 'engine.io/lib/engine.io';
 import {EventEmitter} from "events";
 import debugModule from "debug";
 // @ts-ignore
-import {Socket as OrigEioSocket} from 'engine.io/lib/socket';
+import {Socket} from 'engine.io/lib/socket';
 import type {EioSocketState} from "./EngineActorBase";
 import {WebsocketTransport} from "./WebsocketTransport";
 
@@ -27,9 +27,9 @@ function createStubEioServer() {
  * - error
  * - close
  */
-export class EioSocket extends OrigEioSocket {
+export class EioSocket extends Socket {
     constructor(private readonly socketState: EioSocketState, private readonly _transport: WebsocketTransport) {
-        super(socketState.eioSocketId, createStubEioServer(), _transport, null, 4);
+        super(socketState.eioSocketId, createStubEioServer() as any, _transport, null!, 4);
     }
 
     setupOutgoingEvents(
@@ -45,7 +45,7 @@ export class EioSocket extends OrigEioSocket {
         // TODO: subscribe to close/error inside SioActor code
     }
 
-    schedulePing() {
+    protected override schedulePing() {
         // rewrite to workaround incompatible 'timer' polyfill in CF worker
         // (this also removes server-initiated ping timeout detection in protocol v4)
         this.pingTimeoutTimer = {
@@ -58,7 +58,7 @@ export class EioSocket extends OrigEioSocket {
         }
     }
 
-    resetPingTimeout() {
+    override resetPingTimeout() {
         // emptied to fit `schedulePing` change
     }
 

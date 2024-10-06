@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/strictest/tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "noEmit": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "moduleResolution": "bundler"
+  }
+}

@@ -4,9 +4,9 @@ import type * as CF from '@cloudflare/workers-types';
 // @ts-expect-error
 import {DurableObject} from "cloudflare:workers";
 import {Hono} from "hono";
-import {lazy} from "socket.io-serverless/src/utils/lazy";
+import {lazy} from "../../utils/lazy";
 import {EngineDelegate} from "./EngineDelegate";
-import {SocketActor} from "../SocketActor";
+import {SocketActor} from "../sio/SocketActor";
 import {EioSocket} from "./EioSocket";
 import {WebsocketTransport} from "./WebsocketTransport";
 

@@ -4,7 +4,7 @@ import {Server as OrigSioServer, Socket} from 'socket.io/lib';
 import type * as CF from "@cloudflare/workers-types";
 import debugModule from "debug";
 import {EioSocketStub} from "./EioSocketStub";
-import {SioClient} from "./Client";
+import {SioClient} from "./SioClient";
 import {EngineActorBase} from "../eio/EngineActorBase";
 import type * as sio from 'socket.io'
 import {Persister} from "./Persister";
@@ -29,15 +29,15 @@ export class SioServer extends OrigSioServer {
             transports: ['websocket'],
             allowEIO3: false,
             serveClient: false,
-            connectionStateRecovery: null,
+            connectionStateRecovery: undefined,
             cleanupEmptyChildNamespaces: true,
-            // adapter: TODO,
         },);
     }
 
     _sendEioPacket(stub: EioSocketStub, msg: string | Buffer) {
         /**
-         * NOTE the ownerActor received from RPC may be unusable as a DO id
+         * NOTE the ownerActor received from RPC lacks something
+         * and needs to be before used to call RPC
          */
         const destId = this.engineActorNs.idFromString(stub.ownerActor.toString())
         debugLogger('CustomSioServer#_sendEioPacket', destId, stub.eioSocketId, msg)

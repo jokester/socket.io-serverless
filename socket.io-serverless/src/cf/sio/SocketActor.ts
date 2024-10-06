@@ -1,17 +1,15 @@
 import type * as CF from '@cloudflare/workers-types';
 // @ts-expect-error
 import {DurableObject} from "cloudflare:workers";
-import type {WorkerBindings} from "./workerApp";
 import debug from 'debug'
-import * as forwardEverything from "../app/forward-everything";
-import {SioServer} from './sio/SioServer'
-import {EioSocketStub} from "./sio/EioSocketStub";
+import {SioServer} from './SioServer'
+import {EioSocketStub} from "./EioSocketStub";
 import {lazyThenable} from "@jokester/ts-commonutil/lib/concurrency/lazy-thenable";
-import {createSioServer} from "./sio/factory";
+import {createSioServer} from "./factory";
 
 const debugLogger = debug('sio-serverless:SocketActor');
 
-export class SocketActor extends DurableObject<WorkerBindings> implements CF.DurableObject {
+export class SocketActor<WorkerBindings> extends DurableObject<WorkerBindings> implements CF.DurableObject {
 
     fetch(req: CF.Request) {
         throw new Error('Method not implemented.');
@@ -42,18 +40,16 @@ export class SocketActor extends DurableObject<WorkerBindings> implements CF.Dur
         sioServer.onEioError(socketId, error)
     }
 
-    async setupSioServer(s: SioServer) {
-        // XXX how to support such use with re-created nsps / sockets?
-        s.of(forwardEverything.parentNamespace)
-            .on('connection', (socket: Socket) => {
-                debugLogger('SocketActor#setupSioServer', 'connection', socket.id)
-                forwardEverything.onConnection(socket);
-            });
+    /**
+     * extension point
+     */
+    async onServerCreated(s: SioServer) {
+        debugLogger('SocketActor#onServerCreated')
     }
 
     private readonly sioServer = lazyThenable(async () => {
         const s = await createSioServer(this.ctx, this.env.engineActor)
-        await this.setupSioServer(s)
+        await this.onServerCreated(s)
         await s.restoreState()
         s.startPersisting()
         return s

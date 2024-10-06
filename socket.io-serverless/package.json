@@ -1,4 +1,22 @@
 {
   "name": "socket.io-serverless",
-  "description": "run socket.io server in Cloudflare workers."
+  "description": "A custom socket.io build to run in Cloudflare workers.",
+  "$$exports": {
+    "development": "./src/index.ts"
+  },
+  "dependencies": {
+    "@jokester/ts-commonutil": "^0.6.0",
+    "debug": "^4.3.7",
+    "hono": "^4.5.11",
+    "engine.io": "workspace:*",
+    "socket.io-adapter": "workspace:*",
+    "socket.io": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240903.0",
+    "@tsconfig/strictest": "^2.0.5",
+    "@types/debug": "^4.1.12",
+    "@types/ws": "^8",
+    "typescript": "^5.6"
+  }
 }

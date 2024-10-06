@@ -1,7 +1,7 @@
 import debugModule from 'debug'
 import type * as CF from '@cloudflare/workers-types';
 import {EioSocketState} from "./EngineActorBase";
-import {SocketActor} from "../SocketActor";
+import {SocketActor} from "../sio/SocketActor";
 import {EioSocket} from "./EioSocket";
 import {WebsocketTransport} from "./WebsocketTransport";
 

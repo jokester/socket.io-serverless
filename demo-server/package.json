@@ -30,7 +30,6 @@
     "@types/node": "^20",
     "@types/ws": "^8",
     "base64id": "^2.0.0",
-    "esbuild": "*",
     "tsx": "*",
     "typescript": "*",
     "wrangler": "*"
