@@ -64,13 +64,26 @@ const renameNodeStdlibImports = {
       // return {path: 'node:crypto', external: true}
       return { path: path.join(mocksRoot, "node_crypto.mjs") };
     });
-    build.onResolve({ filter: /^url$/ }, async (args) => {
+    build.onResolve({ filter: /^u$rl$/ }, async (args) => {
       debugLogger("renameNodeStdlibImports", args);
       // return {path: 'node:url', external: true}
       return { path: path.join(mocksRoot, "node_url.mjs") };
     });
   },
 };
+
+/**
+ * @type {esbuild.Plugin}
+ */
+const require2importPlugin = {
+  name: 'require2importPlugin',
+  setup(build) {
+    build.onResolve({filter: /^(crypto|debug|url)$/}, async (args) => {
+
+    })
+
+  }
+}
 /**
  * rewire import of socket.io files, to bypass export map and import TS directly
  * @type {esbuild.Plugin}
@@ -148,7 +161,7 @@ const rewireSocketIoImports = {
  */
 function buildRewirePlugin(imports) {
   const serverlessRewireMap = {
-    debug: path.join(mocksRoot, "debug/index.js"),
+    // debug: path.join(mocksRoot, "debug/index.js"),
     ws: path.join(mocksRoot, "ws/index.js"),
     accepts: path.join(mocksRoot, "empty.js"),
     path: path.join(mocksRoot, "empty.js"),
@@ -213,7 +226,7 @@ const cfBuildContext = {
     "crypto",
     "node:crypto",
     "querystring",
-    "base64id", //let wrangler bundle it */
+    // "base64id", //let wrangler bundle it */
   ],
   plugins: [
     rewireSocketIoImports,

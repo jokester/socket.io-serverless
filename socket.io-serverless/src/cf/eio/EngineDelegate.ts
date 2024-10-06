@@ -14,7 +14,9 @@ export interface EngineDelegate {
     /**
      * extension point for load-balancing
      */
-    getSocketActorStub(sessionId: string): CF.DurableObjectStub<SocketActorBase>
+    getSocketActorStub(sessionId: string): 
+    // @ts-expect-error
+    CF.DurableObjectStub<SocketActorBase>
     // called on outgoing client messages
     recallSocketStateForId(eioSocketId: string): null | EioSocketState;
     // called on incoming client messages
@@ -27,7 +29,9 @@ export class DefaultEngineDelegate implements EngineDelegate {
 
     private readonly _liveConnections = new Map<string, EioSocket>()
 
-    constructor(private readonly eioActorState: CF.DurableObjectState, private readonly sioActorNs: CF.DurableObjectNamespace<SocketActorBase>) {
+    constructor(private readonly eioActorState: CF.DurableObjectState, 
+        // @ts-expect-error
+        private readonly sioActorNs: CF.DurableObjectNamespace<SocketActorBase>) {
     }
 
     /**

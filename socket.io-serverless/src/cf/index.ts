@@ -12,7 +12,9 @@ export const createEioActor: typeof exported.createEioActor = function <
   return class EioActor extends EngineActorBase<Bindings> {
     override getSocketActorNamespace(
       bindings: Bindings,
-    ): DurableObjectNamespace<SocketActorBase> {
+    ):
+    // @ts-expect-error
+     DurableObjectNamespace<SocketActorBase> {
       return options.getSocketActorNamespace(bindings);
     }
   };
@@ -20,14 +22,16 @@ export const createEioActor: typeof exported.createEioActor = function <
 
 export const createSioActor: typeof exported.createSioActor = function <
   Bindings,
->(options: exported.SioActorOptions) {
+>(options: exported.SioActorOptions<Bindings>) {
   return class SioActor extends SocketActorBase<Bindings> {
     override async onServerCreated(s: SioServer): Promise<void> {
       await options.onServerCreated?.(s);
     }
     getEngineActorNamespace(
       bindings: Bindings,
-    ): CF.DurableObjectNamespace<EngineActorBase> {
+    ): 
+    // @ts-expect-error
+    CF.DurableObjectNamespace<EngineActorBase> {
       return options.getEngineActorNamespace(bindings);
     }
   };

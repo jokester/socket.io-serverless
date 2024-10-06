@@ -1,12 +1,13 @@
 // @ts-ignore
-import {Server as OrigSioServer, Socket, Namespace} from 'socket.io/lib/index';
+import { Server as OrigSioServer, Socket, Namespace } from 'socket.io/lib/index';
+// import type {Client} from 'socket.io/lib/client'
 import type * as CF from "@cloudflare/workers-types";
 import debugModule from "debug";
-import {EioSocketStub} from "./EioSocketStub";
-import {SioClient} from "./SioClient";
-import {EngineActorBase} from "../eio/EngineActorBase";
+import { EioSocketStub } from "./EioSocketStub";
+import { SioClient } from "./SioClient";
+import { EngineActorBase } from "../eio/EngineActorBase";
 import type * as sio from 'socket.io/lib'
-import {Persister} from "./Persister";
+import { Persister } from "./Persister";
 
 const debugLogger = debugModule('sio-serverless:sio:SioServer');
 
@@ -15,9 +16,11 @@ export class SioServer extends OrigSioServer {
 
     constructor(
         options: Partial<sio.ServerOptions>,
-        private readonly socketActorCtx: CF.DurableObjectState, private readonly engineActorNs: CF.DurableObjectNamespace<EngineActorBase>,
-                readonly persister: Persister
-                ) {
+        private readonly socketActorCtx: CF.DurableObjectState,
+        // @ts-expect-error
+        private readonly engineActorNs: CF.DurableObjectNamespace<EngineActorBase>,
+        readonly persister: Persister
+    ) {
         debugLogger('CustomSioServer#constructor')
         if (options.connectionStateRecovery) {
             throw new Error('options.connectionStateRecovery is not supported')
@@ -29,7 +32,7 @@ export class SioServer extends OrigSioServer {
             transports: ['websocket'],
             allowEIO3: false,
             serveClient: false,
-            connectionStateRecovery: undefined,
+            // connectionStateRecovery: undefined,
             cleanupEmptyChildNamespaces: true,
         },);
     }
@@ -42,12 +45,13 @@ export class SioServer extends OrigSioServer {
         const destId = this.engineActorNs.idFromString(stub.ownerActor.toString())
         debugLogger('CustomSioServer#_sendEioPacket', destId, stub.eioSocketId, msg)
         const engineActorStub = this.engineActorNs.get(destId)
+        // @ts-expect-error
         engineActorStub.sendMessage(stub.eioSocketId, msg).then(
             (sentFromEioActor: boolean) => {
                 // TODO: handle closed connection
                 debugLogger('sent', stub.eioSocketId, sentFromEioActor, msg)
             },
-            e => {
+            (e: unknown) => {
                 debugLogger('failed to send', stub.eioSocketId, msg, e)
             })
     }
@@ -56,7 +60,7 @@ export class SioServer extends OrigSioServer {
         const s = await this.persister.loadServerState()
         debugLogger('restore server state', s)
         const recoveredNsps = new Map<string, Namespace>()
-        for(const nsName of s.concreteNamespaces) {
+        for (const nsName of s.concreteNamespaces) {
             if (nsName == '/') {
                 // root ns is created by default
                 continue
@@ -83,17 +87,20 @@ export class SioServer extends OrigSioServer {
                 }
 
                 // replay Namespace#_add() , to not call Namespace#_doConnect()
-                const socket = new Socket(nsp, client, {}, {
+                const socket = new Socket(nsp, client as any, {}, {
                     sid: nspState.socketId,
                     pid: nspState.socketPid,
                     rooms: nspState.rooms,
                     missedPackets: [],
+                    data: null
                 })
 
                 // modified version of Namespace#_doConnect , to not call Socket#_onconnect
                 // this is needed to not send
                 nsp.sockets.set(socket.id, socket)
+                // @ts-expect-error
                 nsp.emitReserved("connect", socket);
+                // @ts-expect-error
                 nsp.emitReserved("connection", socket);
 
                 // replay Socket#_onconnect
@@ -101,18 +108,22 @@ export class SioServer extends OrigSioServer {
                 socket.join(socket.id)
 
                 // replay: Client#doConnect
+                // @ts-expect-error
                 client.sockets.set(socket.id, socket)
+                // @ts-expect-error
                 client.nsps.set(nsp.name, socket)
 
+                // @ts-expect-error
                 debugLogger('recreated sio.Socket', socket.id, socket.pid)
             })
+            // @ts-expect-error
             debugLogger('recreated SioClient', client.conn.eioSocketId, Array.from(client.nsps.keys()))
         })
 
     }
 
     startPersisting() {
-        for(const nsp of this._nsps.values()) {
+        for (const nsp of this._nsps.values()) {
             nsp.on('connection', (socket: Socket) => this.persister.onSocketConnect(socket))
         }
         /**
@@ -132,10 +143,10 @@ export class SioServer extends OrigSioServer {
         // NOTE SioClient creation will only be triggered later
     }
 
-    of(
+    override of(
         name: string | RegExp | Function,
         fn?: (
-            socket: Socket<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+            socket: Socket<never, never, never>
         ) => void
     ): Namespace {
         if (typeof name === 'function') {

@@ -122,7 +122,7 @@ export class Persister {
       KEY_GLOBAL_STATE_CLIENTS,
       (prev) => {
         prev?.clientIds.delete(stub.eioSocketId);
-        return prev;
+        return prev!;
       }
     );
     await this.replaceClientState(stub.eioSocketId, whatever => null)
@@ -132,12 +132,13 @@ export class Persister {
    * called when a sio.Client joins a sio.Namespace
    */
   async onSocketConnect(socket: sio.Socket) {
-    const clientId = (socket.client as SioClient).conn.eioSocketId;
+    const clientId = (socket.client as unknown as SioClient).conn.eioSocketId;
     debugLogger("onSocketConnect", clientId, socket.nsp.name);
 
     await this.replaceClientState(clientId, (prev) => {
       prev!.namespaces.set(socket.nsp.name, {
         socketId: socket.id,
+        // @ts-expect-error use of private
         socketPid: socket.pid,
         rooms: [],
       });
@@ -149,7 +150,7 @@ export class Persister {
    * called when a sio.Client leaves a sio.Namespace
    */
   async onSocketDisconnect(socket: sio.Socket) {
-    const clientId = (socket.client as SioClient).conn.eioSocketId;
+    const clientId = (socket.client as unknown as SioClient).conn.eioSocketId;
     debugLogger("onSocketDisconnect", clientId, socket.nsp.name);
     await this.replaceClientState(clientId, (prev) => {
       prev!.namespaces.delete(socket.nsp.name);
@@ -189,15 +190,21 @@ export class Persister {
     debugLogger("replaceClientState updated", clientId, updated);
   }
 
-  async persistSioClient$$$(client) {
+}
+
+class Unused {
+  async persistSioClient$$$(client: SioClient) {
+    // @ts-expect-error
     client.sockets; // sioSocket.id => Socket
+    // @ts-expect-error
     client.nsps; // nsp.name => Socket
   }
 
-  persistSioSocket$$$(concreteNs, socket) {
+  persistSioSocket$$$(concreteNs: sio.Namespace, socket: sio.Socket) {
     socket.nsp; // the concrete ns
     socket.client; // the sio.Client
     socket.id;
+    // @ts-expect-error
     socket.pid;
   }
 }

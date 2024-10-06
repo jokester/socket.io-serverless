@@ -46,7 +46,9 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
         sioServer.onEioError(socketId, error)
     }
 
-    abstract getEngineActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<EngineActorBase>;
+    abstract getEngineActorNamespace(bindings: Bindings):
+        // @ts-expect-error
+        CF.DurableObjectNamespace<EngineActorBase>;
 
     /**
      * extension point
@@ -64,7 +66,10 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
     })
 }
 
-async function createSioServer(ctx: CF.DurableObjectState, engineActorNs: CF.DurableObjectNamespace<EngineActorBase>): Promise<SioServer> {
+async function createSioServer(
+    ctx: CF.DurableObjectState,
+    // @ts-expect-error
+    engineActorNs: CF.DurableObjectNamespace<EngineActorBase>): Promise<SioServer> {
     const persister = new Persister(ctx)
     /**
      * adapter class should exist per DO
@@ -75,7 +80,7 @@ async function createSioServer(ctx: CF.DurableObjectState, engineActorNs: CF.Dur
         }
     }
     return new SioServer(
-        {
-            adapter: BoundAdapter,
-        }, ctx, engineActorNs, persister)
+        // @ts-expect-error
+        { adapter: BoundAdapter, },
+        ctx, engineActorNs, persister)
 }

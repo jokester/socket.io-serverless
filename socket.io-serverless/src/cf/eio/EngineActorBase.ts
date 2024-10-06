@@ -33,6 +33,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         this.delegate = new DefaultEngineDelegate(state, this.getSocketActorNamespace(env))
     }
 
+    // @ts-ignore
     abstract getSocketActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<SocketActorBase>
 
     /**
