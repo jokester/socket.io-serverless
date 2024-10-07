@@ -3,7 +3,7 @@
   "description": "run socket.io server in Cloudflare workers.",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm",
+  "packageManager": "pnpm@9.12.0",
   "devDependencies": {
     "typescript": "^5.6",
     "@types/node": "^20"

@@ -9,3 +9,6 @@ run-demo-client:
 
 run-demo-server:
 	pnpm run --filter ./demo-server dev:cf
+
+build-demo-server:
+	pnpm run --filter ./demo-server build:cf

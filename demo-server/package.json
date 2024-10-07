@@ -8,6 +8,7 @@
     "lint": "gts lint",
     "clean": "gts clean",
     "dev:cf": "DEBUG=limb:*,-socket.io:* wrangler dev",
+    "build:cf": "DEBUG=limb:*,-socket.io:* wrangler deploy --dry-run --outdir ./build",
     "dev:node": "DEBUG=limb:*,-socket.io:* tsx watch src/node/main.ts",
     "deploy:cf": "wrangler deploy",
     "fix": "gts fix"
@@ -31,6 +32,6 @@
     "base64id": "^2.0.0",
     "tsx": "*",
     "typescript": "*",
-    "wrangler": "*"
+    "wrangler": "^3.80"
   }
 }
