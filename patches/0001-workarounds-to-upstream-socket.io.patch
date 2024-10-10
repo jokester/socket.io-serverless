@@ -1,0 +1,116 @@
+From 786b6b02c194750ef39a90e15ae5305d97e874f4 Mon Sep 17 00:00:00 2001
+From: Wang Guan <momocraft@gmail.com>
+Date: Mon, 7 Oct 2024 21:47:08 +0900
+Subject: [PATCH] workarounds to upstream socket.io
+
+---
+ packages/engine.io-client/package.json | 10 +++++-----
+ packages/engine.io-parser/package.json |  4 +---
+ packages/engine.io/package.json        |  5 -----
+ packages/socket.io/lib/client.ts       |  4 ++--
+ packages/socket.io/lib/index.ts        |  5 -----
+ packages/socket.io/package.json        |  5 -----
+ 6 files changed, 8 insertions(+), 25 deletions(-)
+
+diff --git a/packages/engine.io-client/package.json b/packages/engine.io-client/package.json
+index 0a76e8c..bbf25c6 100644
+--- a/packages/engine.io-client/package.json
++++ b/packages/engine.io-client/package.json
+@@ -71,13 +71,13 @@
+     "prepack": "npm run compile"
+   },
+   "browser": {
+-    "./test/node.js": false,
+-    "./build/esm/transports/polling-xhr.node.js": "./build/esm/transports/polling-xhr.js",
+-    "./build/esm/transports/websocket.node.js": "./build/esm/transports/websocket.js",
+-    "./build/esm/globals.node.js": "./build/esm/globals.js",
++    "./build/cjs/globals.node.js": "./build/cjs/globals.js",
+     "./build/cjs/transports/polling-xhr.node.js": "./build/cjs/transports/polling-xhr.js",
+     "./build/cjs/transports/websocket.node.js": "./build/cjs/transports/websocket.js",
+-    "./build/cjs/globals.node.js": "./build/cjs/globals.js"
++    "./build/esm/globals.node.js": "./build/esm/globals.js",
++    "./build/esm/transports/polling-xhr.node.js": "./build/esm/transports/polling-xhr.js",
++    "./build/esm/transports/websocket.node.js": "./build/esm/transports/websocket.js",
++    "./test/node.js": false
+   },
+   "homepage": "https://github.com/socketio/socket.io/tree/main/packages/engine.io-client#readme",
+   "repository": {
+diff --git a/packages/engine.io-parser/package.json b/packages/engine.io-parser/package.json
+index d661db3..4313aa2 100644
+--- a/packages/engine.io-parser/package.json
++++ b/packages/engine.io-parser/package.json
+@@ -33,9 +33,7 @@
+   "browser": {
+     "./test/node": "./test/browser",
+     "./build/esm/encodePacket.js": "./build/esm/encodePacket.browser.js",
+-    "./build/esm/decodePacket.js": "./build/esm/decodePacket.browser.js",
+-    "./build/cjs/encodePacket.js": "./build/cjs/encodePacket.browser.js",
+-    "./build/cjs/decodePacket.js": "./build/cjs/decodePacket.browser.js"
++    "./test/node": "./test/browser"
+   },
+   "engines": {
+     "node": ">=10.0.0"
+diff --git a/packages/engine.io/package.json b/packages/engine.io/package.json
+index ccd64cf..e707790 100644
+--- a/packages/engine.io/package.json
++++ b/packages/engine.io/package.json
+@@ -5,11 +5,6 @@
+   "type": "commonjs",
+   "main": "./build/engine.io.js",
+   "types": "./build/engine.io.d.ts",
+-  "exports": {
+-    "types": "./build/engine.io.d.ts",
+-    "import": "./wrapper.mjs",
+-    "require": "./build/engine.io.js"
+-  },
+   "author": "Guillermo Rauch <guillermo@learnboost.com>",
+   "contributors": [
+     {
+diff --git a/packages/socket.io/lib/client.ts b/packages/socket.io/lib/client.ts
+index 6ca7b77..c148c2d 100644
+--- a/packages/socket.io/lib/client.ts
++++ b/packages/socket.io/lib/client.ts
+@@ -1,6 +1,6 @@
+ import { Decoder, Encoder, Packet, PacketType } from "socket.io-parser";
+-import debugModule = require("debug");
+-import url = require("url");
++import debugModule from "debug";
++import url from "url";
+ import type { IncomingMessage } from "http";
+ import type { Server } from "./index";
+ import type { Namespace } from "./namespace";
+diff --git a/packages/socket.io/lib/index.ts b/packages/socket.io/lib/index.ts
+index b77b8fd..ec527ea 100644
+--- a/packages/socket.io/lib/index.ts
++++ b/packages/socket.io/lib/index.ts
+@@ -1163,11 +1163,6 @@ emitterMethods.forEach(function (fn) {
+   };
+ });
+ 
+-module.exports = (srv?, opts?) => new Server(srv, opts);
+-module.exports.Server = Server;
+-module.exports.Namespace = Namespace;
+-module.exports.Socket = Socket;
+-
+ export {
+   Socket,
+   DisconnectReason,
+diff --git a/packages/socket.io/package.json b/packages/socket.io/package.json
+index 8c52110..49a1e18 100644
+--- a/packages/socket.io/package.json
++++ b/packages/socket.io/package.json
+@@ -25,11 +25,6 @@
+   },
+   "type": "commonjs",
+   "main": "./dist/index.js",
+-  "exports": {
+-    "types": "./dist/index.d.ts",
+-    "import": "./wrapper.mjs",
+-    "require": "./dist/index.js"
+-  },
+   "types": "./dist/index.d.ts",
+   "license": "MIT",
+   "homepage": "https://github.com/socketio/socket.io/tree/main/packages/socket.io#readme",
+-- 
+2.46.2
+
