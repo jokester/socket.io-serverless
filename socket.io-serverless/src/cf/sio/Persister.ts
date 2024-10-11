@@ -36,7 +36,7 @@ const KEY_CLIENT_STATE_PREFIX = `${DEBUG_KEY_PREFIX}_client_`;
 
 
 export class Persister {
-  constructor(private readonly sioCtx: CF.DurableObjectState) {}
+  constructor(private readonly sioCtx: CF.DurableObjectState) { }
 
   async DEV_resetState() {
     await this.sioCtx.storage.deleteAll();
@@ -102,8 +102,17 @@ export class Persister {
     );
   }
 
-  async onAliveClientsVerified(clientIds: readonly string[]) {
-    await this.replaceGlobalState<PersistedSioServerStateClients>(KEY_GLOBAL_STATE_CLIENTS, prev => ({clientIds: new Set(clientIds)}))
+  /**
+   * remove dead client ids in storage
+   */
+  async persistRestoredClients(savedClientIds: ReadonlySet<string>, aliveClientIds: ReadonlySet<string>) {
+    await this.replaceGlobalState<PersistedSioServerStateClients>(KEY_GLOBAL_STATE_CLIENTS, prev => ({ clientIds: new Set(aliveClientIds) }))
+    for (const i of savedClientIds) {
+      if (!aliveClientIds.has(i)) {
+        debugLogger('persistRestoredClients removing', i)
+        await this.replaceClientState(i, () => null)
+      }
+    }
   }
 
   async onNewClient(stub: EioSocketStub) {

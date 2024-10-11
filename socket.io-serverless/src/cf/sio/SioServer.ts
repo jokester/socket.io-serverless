@@ -42,9 +42,8 @@ export class SioServer extends OrigSioServer {
          * NOTE the ownerActor received from RPC lacks something
          * and needs to be before used to call RPC
          */
-        const destId = this.engineActorNs.idFromString(stub.ownerActor.toString())
-        debugLogger('CustomSioServer#_sendEioPacket', destId, stub.eioSocketId, msg)
-        const engineActorStub = this.engineActorNs.get(destId)
+        const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActor)
+        debugLogger('CustomSioServer#_sendEioPacket', engineActorStub.id, stub.eioSocketId, msg)
         // @ts-expect-error
         engineActorStub.sendMessage(stub.eioSocketId, msg).then(
             (sentFromEioActor: boolean) => {
@@ -73,21 +72,27 @@ export class SioServer extends OrigSioServer {
             recoveredNsps.set(nsName, this.of(nsName))
         }
 
-        // FIXME should be batched
+        // FIXME should this be batched?
         const clientStates = await this.persister.loadClientStates(s.clientIds)
 
-        const revivedClientIds: string[] = []
+        const revivedClientIds = new Set<string>
         for (const [clientId, clientState] of clientStates) {
+            // revive client only if the underlying ws conn is alive
             const revived = await this.reviveClientState(clientId, clientState, recoveredNsps)
             if (revived) {
-                revivedClientIds.push(clientId)
+                revivedClientIds.add(clientId)
             }
         }
-        await this.persister.onAliveClientsVerified(revivedClientIds)
+        await this.persister.persistRestoredClients(s.clientIds, revivedClientIds)
     }
 
     private async reviveClientState(clientId: string, clientState: PersistedSioClientState, recoveredNsps: ReadonlyMap<string, Namespace>,): Promise<boolean> {
         {
+            const eioActorStub = deserializeDoStub(this.engineActorNs, clientState.engineActorId)
+            if (!await eioActorStub.getSocketAlive(clientId)) {
+                return false
+            }
+
             // TODO: call isAlive()
             // const isAlive = await this.engineActorNs.
         }
@@ -135,7 +140,7 @@ export class SioServer extends OrigSioServer {
         })
         // @ts-expect-error
         debugLogger('recreated SioClient', client.conn.eioSocketId, Array.from(client.nsps.keys()))
-
+        return true
     }
 
     startPersisting() {
@@ -212,6 +217,8 @@ export class SioServer extends OrigSioServer {
 
 }
 
-export function reviveSio(dons: CF.DurableObjectNamespace, s: PersistedSioClientState): CF.DurableObjectStub {
-
+// @ts-expect-error
+export function deserializeDoStub(ns: CF.DurableObjectNamespace, actorId: string | CF.DurableObjectId): CF.DurableObjectStub<EngineActorBase> {
+    const destId = ns.idFromString(actorId.toString())
+    return ns.get(destId)
 }
