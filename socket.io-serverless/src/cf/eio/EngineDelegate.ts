@@ -23,6 +23,7 @@ export interface EngineDelegate {
     recallSocketStateForConn(ws: CF.WebSocket): null | EioSocketState
     createEioSocket(eioSocketId: string, serverSocket: CF.WebSocket): Promise<EioSocket>
     reviveEioSocket(state: EioSocketState): null | EioSocket
+    getCfWebSocket(eioSocketId: string) : null | CF.WebSocket
 }
 
 export class DefaultEngineDelegate implements EngineDelegate {
@@ -98,7 +99,21 @@ export class DefaultEngineDelegate implements EngineDelegate {
                 return alive
             }
         }
-        const tag = `sid:${state.eioSocketId}`
+        const ws  = this.getCfWebSocket(state.eioSocketId)
+        if (!ws) {
+            return null
+        }
+        const transport = WebsocketTransport.create(ws)
+        const revived = new RevivedEioSocket(state, transport) as unknown as EioSocket
+        revived.setupOutgoingEvents(state)
+        this._liveConnections.set(state.eioSocketId, revived);
+        debugLogger('revived EioSocket', state.eioSocketId)
+        return revived
+    }
+
+    getCfWebSocket(eioSocketId: string) : null | CF.WebSocket {
+
+        const tag = `sid:${eioSocketId}`
 
         const ws = this.eioActorState.getWebSockets(tag)
         if (ws.length !== 1) {
@@ -111,11 +126,6 @@ export class DefaultEngineDelegate implements EngineDelegate {
             }
             return null
         }
-        const transport = WebsocketTransport.create(ws[0]!)
-        const revived = new RevivedEioSocket(state, transport) as unknown as EioSocket
-        revived.setupOutgoingEvents(state)
-        this._liveConnections.set(state.eioSocketId, revived);
-        debugLogger('revived EioSocket', state.eioSocketId)
-        return revived
+        return ws[0]!
     }
 }
