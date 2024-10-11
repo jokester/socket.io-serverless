@@ -1,16 +1,16 @@
-lib:
+lib-build:
 	cd socket.io-serverless && node build.mjs
 
 lib-watch:
 	cd socket.io-serverless && node build.mjs --watch
 
-run-demo-client:
+demo-client-dev:
 	pnpm run --filter ./demo-client dev
 
-run-demo-server:
+demo-server-dev:
 	pnpm run --filter ./demo-server dev:cf
 
-build-demo-server:
+demo-server-bundle:
 	pnpm run --filter ./demo-server build:cf
 
 patch-upstream:
