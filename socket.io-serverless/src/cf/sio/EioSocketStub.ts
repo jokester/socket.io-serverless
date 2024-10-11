@@ -45,6 +45,7 @@ export class EioSocketStub extends EventEmitter {
 
     write(packet: string | Buffer, opts: unknown) {
         debugLogger('EioSocketStub#write', packet, opts)
+        // FIXME can we keep a reference in this object?
         this.server._sendEioPacket(this, packet)
     }
 

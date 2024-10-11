@@ -13,7 +13,7 @@ interface PersistedSioServerStateClients {
   clientIds: Set<string>; // equal to eioSocket.id
 }
 
-interface PersistedSioClientState {
+export interface PersistedSioClientState {
   // TODO: persist this, maybe in Client#constructor
   clientId: string;
   engineActorId: CF.DurableObjectId;
@@ -32,6 +32,8 @@ const DEBUG_KEY_PREFIX = ""; // '_00003_'
 const KEY_GLOBAL_STATE_NAMESPACES = `${DEBUG_KEY_PREFIX}_namespaces`;
 const KEY_GLOBAL_STATE_CLIENTS = `${DEBUG_KEY_PREFIX}_clients`;
 const KEY_CLIENT_STATE_PREFIX = `${DEBUG_KEY_PREFIX}_client_`;
+
+
 
 export class Persister {
   constructor(private readonly sioCtx: CF.DurableObjectState) {}
@@ -98,6 +100,10 @@ export class Persister {
         ),
       })
     );
+  }
+
+  async onAliveClientsVerified(clientIds: readonly string[]) {
+    await this.replaceGlobalState<PersistedSioServerStateClients>(KEY_GLOBAL_STATE_CLIENTS, prev => ({clientIds: new Set(clientIds)}))
   }
 
   async onNewClient(stub: EioSocketStub) {
