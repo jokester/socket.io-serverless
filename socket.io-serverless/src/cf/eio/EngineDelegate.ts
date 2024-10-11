@@ -2,7 +2,7 @@ import debugModule from 'debug'
 import type * as CF from '@cloudflare/workers-types';
 import {EioSocketState} from "./EngineActorBase";
 import type {SocketActorBase} from "../sio/SocketActorBase";
-import {EioSocket} from "./EioSocket";
+import {EioSocket, RevivedEioSocket} from "./EioSocket";
 import {WebsocketTransport} from "./WebsocketTransport";
 
 const debugLogger = debugModule('sio-serverless:eio:EngineDelegate');
@@ -112,7 +112,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
             return null
         }
         const transport = WebsocketTransport.create(ws[0]!)
-        const revived = new EioSocket(state, transport, true)
+        const revived = new RevivedEioSocket(state, transport) as unknown as EioSocket
         revived.setupOutgoingEvents(state)
         this._liveConnections.set(state.eioSocketId, revived);
         debugLogger('revived EioSocket', state.eioSocketId)
