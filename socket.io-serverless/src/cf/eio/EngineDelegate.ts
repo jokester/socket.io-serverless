@@ -79,7 +79,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
             eioSocketId,
             socketActorStub: sioActorStub,
         }
-        const created = new EioSocket(socketState, transport, false);
+        const created = new EioSocket(socketState, transport);
 
         // @ts-ignore
         await sioActorStub.onEioSocketConnection(socketState.eioActorId, eioSocketId)

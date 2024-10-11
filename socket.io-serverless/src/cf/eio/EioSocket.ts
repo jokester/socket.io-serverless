@@ -1,11 +1,11 @@
 // @ts-ignore
 import type * as eio from 'engine.io/lib/engine.io';
-import {EventEmitter} from "events";
+import { EventEmitter } from "events";
 import debugModule from "debug";
 // @ts-ignore
-import {Socket} from 'engine.io/lib/socket';
-import type {EioSocketState} from "./EngineActorBase";
-import {WebsocketTransport} from "./WebsocketTransport";
+import { Socket } from 'engine.io/lib/socket';
+import type { EioSocketState } from "./EngineActorBase";
+import { WebsocketTransport } from "./WebsocketTransport";
 
 const debugLogger = debugModule('sio-serverless:eio:EioSocket');
 
@@ -13,8 +13,8 @@ function createStubEioServer() {
     const server = new EventEmitter();
     Object.assign(server, {
         opts: {
-            pingInterval: 10_000,
-            pingTimeout: 20_000,
+            pingInterval: 30_000,
+            pingTimeout: 90_000,
         } as eio.ServerOptions,
         upgrades: () => [],
     });
