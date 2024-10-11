@@ -27,8 +27,8 @@ This lib heavily rewires things to run in and take advantage of Durable Objects.
 
 - *Simpler* socket.io-based server should still work.
 
-- Support  and [Hibernation]() to save costs.
-    - To make socket.io code work across Durable Object ([hibernates, internal states are persisted with [storage API](https://developers.cloudflare.com/durable-objects/api/storage-api/), 
+- Support [Hibernation](https://developers.cloudflare.com/durable-objects/examples/websocket-hibernation-server/) to save costs.
+    - Across Durable Object lifecycles, internal states are persisted with [storage API](https://developers.cloudflare.com/durable-objects/api/storage-api/)
 
 <!-- [Alarm](https://developers.cloudflare.com/durable-objects/api/alarms/) -->
 
