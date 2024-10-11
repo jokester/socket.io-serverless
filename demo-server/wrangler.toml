@@ -7,7 +7,7 @@ compatibility_flags = [ "nodejs_compat_v2" ]
 
 workers_dev = false
 [dev]
-port = 18788
+port = 18787
 
 [durable_objects]
 bindings = [
