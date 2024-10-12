@@ -22,37 +22,6 @@ async function getLocalSioDir(pkgName) {
 }
 
 /**
- * @param {string} pkgName
- * @returns {Promise<string>}
- */
-async function findPackageDir2(pkgName) {
-  try {
-    // should be a file inside that package
-    const resolved = import.meta.resolve(pkgName);
-    const resolvedPath = new URL(resolved).pathname;
-
-    for (
-      let dir = path.dirname(resolvedPath);
-      dir !== path.dirname(dir);
-      dir = path.dirname(dir)
-    ) {
-      if (
-        path.basename(dir) === pkgName &&
-        fs.existsSync(path.join(dir, "package.json"))
-      ) {
-        return dir;
-      }
-    }
-    throw new Error(`Could not find package directory upward from ${resolved}`);
-  } catch (e) {
-    if (typeof e.path === "string" && e.path.endsWith("/package.json")) {
-      return path.dirname(e.path);
-    }
-    throw e;
-  }
-}
-
-/**
  * wrangler have problem bundling require('crypto')
  * @type {esbuild.Plugin}
  */
@@ -73,18 +42,6 @@ const renameNodeStdlibImports = {
 };
 
 /**
- * @type {esbuild.Plugin}
- */
-const require2importPlugin = {
-  name: 'require2importPlugin',
-  setup(build) {
-    build.onResolve({filter: /^(crypto|debug|url)$/}, async (args) => {
-
-    })
-
-  }
-}
-/**
  * rewire import of socket.io files, to bypass export map and import TS directly
  * @type {esbuild.Plugin}
  */
@@ -95,11 +52,6 @@ const rewireSocketIoImports = {
       // 'base64id': path.join(sioServerlessRoot, 'node_modules/base64id/index.mjs'),
       // "socket.io": path.join(sioPackagesRoot, "socket.io/lib/index.ts"),
       // base64id: 'base64id/lib/base64id.js',
-      base64id: path.join(
-        // FIXME: resolve from current package
-        sioPackagesRoot,
-        "engine.io/node_modules/base64id/lib/base64id.js",
-      ),
       "engine.io": path.join(sioPackagesRoot, "engine.io/lib/engine.io.ts"),
       // './polling': path.join(mocksRoot, 'empty.js'),
       // './polling-jsonp': path.join(mocksRoot, 'empty.js'),
@@ -128,36 +80,27 @@ const rewireSocketIoImports = {
           path: resolvedPath,
         };
       }
-      if (args.importer.includes('packages/socket.io/lib/') || args.importer.includes('packages/engine.io/lib/')) {
-        if (['./uws', './userver', './transports/index', './transports', './transports/webtransport', './server',].includes(args.path)) {
+      if (
+        args.importer.includes("packages/socket.io/lib/") ||
+        args.importer.includes("packages/engine.io/lib/")
+      ) {
+        if (
+          [
+            "./uws",
+            "./userver",
+            "./transports/index",
+            "./transports",
+            "./transports/webtransport",
+            "./server",
+          ].includes(args.path)
+        ) {
           return {
             path: path.join(mocksRoot, "empty.js"),
-          }
-        }
-      }
-    });
-
-    build.onResolve({ filter: /./ }, async (args) => {
-      /**
-       * rewire import of in-package file
-       */
-      for (const pkg of ["socket.io", "engine.io"]) {
-        const argsSegments = args.path.split("/");
-        if (argsSegments.length > 1 && argsSegments[0] === pkg) {
-          let basename = argsSegments.pop();
-          if (![".ts", ".js"].some((ext) => basename.endsWith(ext))) {
-            basename += ".ts";
-          }
-          const fsPath = path.join(
-            await getLocalSioDir(pkg),
-            ...argsSegments.slice(1),
-            basename,
-          );
-          return {
-            path: fsPath,
           };
         }
       }
+
+      return null
     });
   },
 };
@@ -172,7 +115,7 @@ function buildRewirePlugin(imports) {
   const serverlessRewireMap = {
     // debug: path.join(mocksRoot, "debug/index.js"),
     ws: path.join(mocksRoot, "ws/index.js"),
-    debug: path.join(___dirname, 'src/debug/index.ts'),
+    debug: path.join(___dirname, "src/debug/index.ts"),
     accepts: path.join(mocksRoot, "empty_callable.js"),
     path: path.join(mocksRoot, "empty.js"),
     fs: path.join(mocksRoot, "empty.js"),
@@ -192,14 +135,19 @@ function buildRewirePlugin(imports) {
   };
 
   return {
-    name: "injectSocketIoServerlessMocks",
+    name: "rewireLibImports",
     setup(build) {
       build.onResolve({ filter: /./ }, async (args) => {
+        if (args.path === "base64id") {
+          const { path, ...rest } = args;
+          return build.resolve("base64id/lib/base64id.js", rest);
+        }
         if (imports.includes(args.path)) {
           return {
             path: serverlessRewireMap[args.path],
           };
         }
+        return null
       });
     },
   };
@@ -242,7 +190,7 @@ const cfBuildContext = {
     rewireSocketIoImports,
     renameNodeStdlibImports,
     buildRewirePlugin([
-      'accepts',
+      "accepts",
       "debug",
       "http",
       "net",
