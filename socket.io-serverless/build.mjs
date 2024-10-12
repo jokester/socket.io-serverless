@@ -229,9 +229,6 @@ async function reportBuildResult(buildResult) {
   for (const [inputFile, inputInfo] of Object.entries(metafile.inputs)) {
     const { imports, bytes } = inputInfo;
     for (const imp of imports) {
-      if (imp.path.includes("node_modules/hono/")) {
-        continue;
-      }
       if (imp.external) {
         continue;
       }

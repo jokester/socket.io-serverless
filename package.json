@@ -7,5 +7,10 @@
   "devDependencies": {
     "typescript": "^5.6",
     "@types/node": "^20"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/node": "^20"
+    }
   }
 }

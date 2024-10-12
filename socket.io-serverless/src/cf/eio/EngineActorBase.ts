@@ -3,8 +3,6 @@ import type * as CF from '@cloudflare/workers-types';
 
 // @ts-expect-error
 import { DurableObject } from "cloudflare:workers";
-import { Hono } from "hono";
-import { lazy } from "../../utils/lazy";
 import { DefaultEngineDelegate, EngineDelegate } from './EngineDelegate';
 import { SocketActorBase } from "../sio/SocketActorBase";
 
@@ -86,42 +84,34 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         return !!this.delegate.getCfWebSocket(eioSocketId)
     }
 
-    // @ts-ignore
-    fetch(request: Request): Response | Promise<Response> {
-        return this.honoApp.value.fetch(request)
+    async fetch(request: CF.Request): Promise<CF.Response> {
+
+        if (request.headers.get('upgrade') !== 'websocket') {
+            return new self.Response(null, {
+                status: 426,
+                statusText: 'Not a Upgrade request',
+            });
+        }
+
+        const reqUrl = new URL(request.url)
+
+        const socketId = reqUrl.searchParams.get('eio_sid')!
+        if (!(typeof socketId === 'string' && socketId.length >= 10)) {
+            return new self.Response(null, {
+                status: 400,
+                statusText: `invalid eio_sid: ${socketId}`,
+            })
+        }
+
+        debugLogger('new ws connection', reqUrl, socketId);
+
+        const { 0: clientSocket, 1: serverSocket } = new self.WebSocketPair();
+
+        const sid = socketId
+        const tags = [`sid:${sid}`];
+        this.state.acceptWebSocket(serverSocket, tags);
+        debugLogger('accepted ws connection', sid, tags);
+        await this.delegate.createEioSocket(sid, serverSocket)
+        return new self.Response(null, { status: 101, webSocket: clientSocket });
     }
-
-    private readonly honoApp = lazy(() => createHandler(this, this.delegate))
-}
-
-// FIXME: drop hono for plain JS
-function createHandler(actor: EngineActorBase, delegate: EngineDelegate) {
-    return new Hono()
-        // @ts-ignore hono.Response is not CF.Response
-        .get('/socket.io/*', async ctx => {
-            if (ctx.req.header('Upgrade') !== 'websocket') {
-                return new Response(null, {
-                    status: 426,
-                    statusText: 'Not a Upgrade request',
-                });
-            }
-
-            const socketId = ctx.req.query('eio_sid')!
-            if (!(typeof socketId === 'string' && socketId.length >= 10)) {
-                return new Response(null, {
-                    status: 400,
-                    statusText: `invalid eio_sid: ${socketId}`,
-                })
-            }
-
-            debugLogger('new ws connection', ctx.req.url, socketId);
-            const { 0: clientSocket, 1: serverSocket } = new self.WebSocketPair();
-
-            const sid = socketId
-            const tags = [`sid:${sid}`];
-            actor.state.acceptWebSocket(serverSocket, tags);
-            debugLogger('accepted ws connection', sid, tags);
-            await delegate.createEioSocket(sid, serverSocket)
-            return new self.Response(null, { status: 101, webSocket: clientSocket });
-        })
 }
