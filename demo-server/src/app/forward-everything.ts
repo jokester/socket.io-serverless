@@ -1,9 +1,9 @@
-import debug from 'debug';
+import { createDebugLogger } from 'socket.io-serverless/dist/cf';
 import type * as sio from 'socket.io/lib';
 
 export const parentNamespace = /^\/v1\/[-\w:.]+$/;
 
-const logger = debug('limb:server:demo-app');
+const logger = createDebugLogger('limb:server:demo-app');
 
 /**
  * An example socket.io app , forwarding all messages to all clients.

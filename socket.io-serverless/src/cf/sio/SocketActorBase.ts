@@ -1,5 +1,4 @@
 import type * as CF from '@cloudflare/workers-types';
-// @ts-expect-error
 import { DurableObject } from "cloudflare:workers";
 import debug from 'debug'
 import { SioServer } from './SioServer'
@@ -11,13 +10,13 @@ import { SingleActorAdapter } from './SingleActorAdapter';
 
 const debugLogger = debug('sio-serverless:sio:SocketActor');
 
-export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject {
+export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<Bindings> {
 
-    constructor(readonly state: CF.DurableObjectState, readonly env: Bindings) {
-        super(state, env)
+    constructor(readonly state: CF.DurableObjectState, override readonly env: Bindings) {
+        super(state as any, env)
     }
 
-    fetch(req: CF.Request): Promise<never> {
+    override fetch(req: unknown): Promise<never> {
         throw new Error('Method not implemented.');
     }
 
@@ -46,9 +45,7 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
         sioServer.onEioError(socketId, error)
     }
 
-    abstract getEngineActorNamespace(bindings: Bindings):
-        // @ts-expect-error
-        CF.DurableObjectNamespace<EngineActorBase>;
+    abstract getEngineActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<EngineActorBase>;
 
     /**
      * extension point
@@ -68,7 +65,6 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
 
 async function createSioServer(
     ctx: CF.DurableObjectState,
-    // @ts-expect-error
     engineActorNs: CF.DurableObjectNamespace<EngineActorBase>): Promise<SioServer> {
     const persister = new Persister(ctx)
     /**

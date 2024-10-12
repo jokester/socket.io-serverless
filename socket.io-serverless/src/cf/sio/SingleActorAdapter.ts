@@ -1,5 +1,5 @@
-import type {Namespace} from "socket.io";
-import {Adapter} from "socket.io-adapter/lib/in-memory-adapter";
+import type { Namespace } from "socket.io/lib";
+import { Adapter } from "socket.io-adapter/lib/in-memory-adapter";
 import debugModule from "debug";
 import type { Persister } from "./Persister";
 

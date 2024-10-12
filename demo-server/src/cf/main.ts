@@ -3,12 +3,15 @@ import { createEioActor, createSioActor, createDebugLogger, setEnabledLoggerName
 import { Hono } from 'hono';
 import type { DurableObjectNamespace } from '@cloudflare/workers-types';
 import type { Server } from 'socket.io/lib'
-// export { EngineActor } from "../../../socket.io-serverless/src/cf/EngineActor";
-// export { SocketActor } from "../../../socket.io-serverless/src/cf/SocketActor";
 
 const debugLogger = createDebugLogger('socket.io-serverless:demo:cf-main');
 
-setEnabledLoggerNamespace(['engine:', 'socket.io:', 'sio-serverless:eio:']);
+setEnabledLoggerNamespace([
+    // 'engine:',
+    // 'socket.io:',
+    'sio-serverless:eio:',
+    // 'sio-serverless:sio:Persister',
+]);
 
 export const EngineActor = createEioActor<WorkerBindings>({
     getSocketActorNamespace(bindings: WorkerBindings) {
@@ -17,11 +20,11 @@ export const EngineActor = createEioActor<WorkerBindings>({
 });
 
 async function onServerCreated(s: Server) {
-    console.debug('sio.Server created')
+    debugLogger('SioServer created')
     // XXX how to support such use with re-created nsps / sockets?
     s.of(forwardEverything.parentNamespace)
         .on('connection', (socket) => {
-            console.debug('sio.Socket created', socket.nsp.name, socket.id)
+            debugLogger('sio.Socket created', socket.nsp.name, socket.id)
             forwardEverything.onConnection(socket);
         });
 

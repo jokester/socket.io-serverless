@@ -14,9 +14,7 @@ export const createEioActor: typeof exports.createEioActor = function <
   return class EioActor extends EngineActorBase<Bindings> {
     override getSocketActorNamespace(
       bindings: Bindings,
-    ):
-      // @ts-expect-error
-      DurableObjectNamespace<SocketActorBase> {
+    ): DurableObjectNamespace<SocketActorBase> {
       return options.getSocketActorNamespace(bindings);
     }
   };
@@ -31,9 +29,7 @@ export const createSioActor: typeof exports.createSioActor = function <
     }
     getEngineActorNamespace(
       bindings: Bindings,
-    ):
-      // @ts-expect-error
-      CF.DurableObjectNamespace<EngineActorBase> {
+    ): CF.DurableObjectNamespace<EngineActorBase> {
       return options.getEngineActorNamespace(bindings);
     }
   };

@@ -1,8 +1,6 @@
 import debugModule from 'debug'
 import type * as CF from '@cloudflare/workers-types';
-
-// @ts-expect-error
-import { DurableObject } from "cloudflare:workers";
+import { DurableObject } from 'cloudflare:workers';
 import { DefaultEngineDelegate, EngineDelegate } from './EngineDelegate';
 import { SocketActorBase } from "../sio/SocketActorBase";
 
@@ -17,26 +15,34 @@ declare const self: CF.ServiceWorkerGlobalScope;
 export interface EioSocketState {
     eioActorId: CF.DurableObjectId,
     eioSocketId: string
-    // @ts-expect-error
     socketActorStub: CF.DurableObjectStub<SocketActorBase<unknown>>
     ws?: CF.WebSocket
 }
 
+const ALARM_INTERVAL = 5e3
+
 export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject {
 
     private readonly delegate: EngineDelegate
-    constructor(readonly state: CF.DurableObjectState, readonly env: Bindings) {
-        super(state, env)
+    constructor(readonly state: CF.DurableObjectState, override readonly env: Bindings) {
+        super(state as any, env)
         this.delegate = new DefaultEngineDelegate(state, this.getSocketActorNamespace(env))
+        this.state.storage.setAlarm(Date.now() + ALARM_INTERVAL, { allowConcurrency: false })
     }
 
     // @ts-ignore
     abstract getSocketActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<SocketActorBase>
 
-    /**
-     * webSocket* : called by CF runtime
-     */
-    webSocketMessage(ws: CF.WebSocket, message: string | ArrayBuffer) {
+    override async alarm(): Promise<void> {
+        debugLogger('waken up by alarm')
+        for (const w of this.state.getWebSockets()) {
+            debugLogger('would send engine.io ping', w.extensions)
+        }
+        await this.state.storage.setAlarm(Date.now() + ALARM_INTERVAL)
+    }
+
+    // @ts-expect-error
+    override webSocketMessage(ws: CF.WebSocket, message: string | ArrayBuffer) {
         debugLogger('EngineActor#webSocketMessage', message)
         const socketState = this.delegate.recallSocketStateForConn(ws)
         const socket = socketState && this.delegate.reviveEioSocket(socketState)
@@ -44,6 +50,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         socket?.onCfMessage(message as string)
     }
 
+    // @ts-expect-error
     webSocketClose(ws: CF.WebSocket, code: number, reason: string, wasClean: boolean) {
         debugLogger('EngineActor#webSocketClose', code, reason, wasClean)
         const socketState = this.delegate.recallSocketStateForConn(ws)
@@ -52,6 +59,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         socket?.onCfClose(code, reason, wasClean)
     }
 
+    // @ts-expect-error
     webSocketError(ws: CF.WebSocket, error: unknown) {
         debugLogger('EngineActor#webSocketError', error)
         const socketState = this.delegate.recallSocketStateForConn(ws)
@@ -93,6 +101,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         return !!this.delegate.getCfWebSocket(eioSocketId)
     }
 
+    // @ts-expect-error
     async fetch(request: CF.Request): Promise<CF.Response> {
 
         if (request.headers.get('upgrade') !== 'websocket') {

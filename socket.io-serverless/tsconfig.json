@@ -5,6 +5,10 @@
     "noEmit": true,
     "noUnusedParameters": false,
     "noUnusedLocals": false,
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/@cloudflare/workers-types"
+    ],
     "moduleResolution": "bundler"
   }
 }

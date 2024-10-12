@@ -1,11 +1,9 @@
-// @ts-ignore
 import type * as eio from 'engine.io/lib/engine.io';
 import { EventEmitter } from "events";
 import debugModule from "debug";
-// @ts-ignore
 import { Socket } from 'engine.io/lib/socket';
 import type { EioSocketState } from "./EngineActorBase";
-import { WebsocketTransport } from "./WebsocketTransport";
+import { WebSocketTransport } from "./WebSocketTransport";
 
 const debugLogger = debugModule('sio-serverless:eio:EioSocket');
 
@@ -13,8 +11,8 @@ function createStubEioServer() {
     const server = new EventEmitter();
     Object.assign(server, {
         opts: {
-            pingInterval: 30_000,
-            pingTimeout: 90_000,
+            pingInterval: 10_000,
+            pingTimeout: 20_000,
         } as eio.ServerOptions,
         upgrades: () => [],
     });
@@ -28,7 +26,7 @@ function createStubEioServer() {
  * - close
  */
 export class EioSocket extends Socket {
-    constructor(private readonly socketState: EioSocketState, private readonly _transport: WebsocketTransport) {
+    constructor(private readonly socketState: EioSocketState, private readonly _transport: WebSocketTransport) {
         super(socketState.eioSocketId, createStubEioServer() as any, _transport, null!, 4);
         debugLogger('EioSocket created', this.constructor.name, socketState)
     }
@@ -47,7 +45,7 @@ export class EioSocket extends Socket {
     }
 
     // @ts-ignore
-    schedulePing() {
+    private schedulePing() {
         // rewrite to workaround incompatible 'timer' polyfill in CF worker
         // (this also removes server-initiated ping timeout detection in protocol v4)
         this.pingTimeoutTimer = {
@@ -62,12 +60,6 @@ export class EioSocket extends Socket {
 
     override resetPingTimeout() {
         // emptied to fit `schedulePing` change
-    }
-
-    onPingAlarmTick() {
-        // instead of setTimeout, trigger server-sent ping with alarm
-        // TODO: connect alarm
-        this.sendPacket('ping')
     }
 
     onCfClose(code: number, reason: string, wasClean: boolean) {

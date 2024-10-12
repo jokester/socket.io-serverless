@@ -19,7 +19,7 @@ function createStubRequest(
     } as any;
 }
 
-export class WebsocketTransport extends EioWebSocketTransport {
+export class WebSocketTransport extends EioWebSocketTransport {
     constructor(readonly _stubWs: WebSocketStub, stubReq: EngineRequest) {
         super(stubReq);
     }
@@ -29,10 +29,10 @@ export class WebsocketTransport extends EioWebSocketTransport {
         return this.socket;
     }
 
-    static create(cfWebSocket: CF.WebSocket): WebsocketTransport {
+    static create(cfWebSocket: CF.WebSocket): WebSocketTransport {
         const stubWebSocket = WebSocketStub.create(cfWebSocket);
         const stubReq = createStubRequest(stubWebSocket);
-        const transport = new WebsocketTransport(stubWebSocket, stubReq);
+        const transport = new WebSocketTransport(stubWebSocket, stubReq);
         debugLogger('sio-serverless:CustomEioWebsocketTransport created')
         return transport;
     }

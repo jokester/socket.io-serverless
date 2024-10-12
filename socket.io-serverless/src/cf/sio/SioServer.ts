@@ -1,5 +1,4 @@
 import { Server as OrigSioServer, Socket, Namespace } from 'socket.io/lib/index';
-// import type {Client} from 'socket.io/lib/client'
 import type * as CF from "@cloudflare/workers-types";
 import debugModule from "debug";
 import { EioSocketStub } from "./EioSocketStub";
@@ -16,7 +15,6 @@ export class SioServer extends OrigSioServer {
     constructor(
         options: Partial<sio.ServerOptions>,
         private readonly socketActorCtx: CF.DurableObjectState,
-        // @ts-expect-error
         private readonly engineActorNs: CF.DurableObjectNamespace<EngineActorBase>,
         readonly persister: Persister
     ) {
@@ -222,8 +220,7 @@ export class SioServer extends OrigSioServer {
     }
 }
 
-// @ts-expect-error
-export function deserializeDoStub(ns: CF.DurableObjectNamespace, actorId: string | CF.DurableObjectId): CF.DurableObjectStub<EngineActorBase> {
+export function deserializeDoStub(ns: CF.DurableObjectNamespace<EngineActorBase>, actorId: string | CF.DurableObjectId): CF.DurableObjectStub<EngineActorBase> {
     const destId = ns.idFromString(actorId.toString())
     return ns.get(destId)
 }

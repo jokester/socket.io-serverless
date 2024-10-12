@@ -3,7 +3,7 @@ import type * as CF from '@cloudflare/workers-types';
 import {EioSocketState} from "./EngineActorBase";
 import type {SocketActorBase} from "../sio/SocketActorBase";
 import {EioSocket, RevivedEioSocket} from "./EioSocket";
-import {WebsocketTransport} from "./WebsocketTransport";
+import {WebSocketTransport} from "./WebSocketTransport";
 
 const debugLogger = debugModule('sio-serverless:eio:EngineDelegate');
 
@@ -15,7 +15,6 @@ export interface EngineDelegate {
      * extension point for load-balancing
      */
     getSocketActorStub(sessionId: string): 
-    // @ts-expect-error
     CF.DurableObjectStub<SocketActorBase>
     // called on outgoing client messages
     recallSocketStateForId(eioSocketId: string): null | EioSocketState;
@@ -31,7 +30,6 @@ export class DefaultEngineDelegate implements EngineDelegate {
     private readonly _liveConnections = new Map<string, EioSocket>()
 
     constructor(private readonly eioActorState: CF.DurableObjectState, 
-        // @ts-expect-error
         private readonly sioActorNs: CF.DurableObjectNamespace<SocketActorBase>) {
     }
 
@@ -39,7 +37,6 @@ export class DefaultEngineDelegate implements EngineDelegate {
      * @note in future this can be overridden for load-balancing
      */
     getSocketActorStub(sessionId: string):
-    // @ts-expect-error
         CF.DurableObjectStub<SocketActorBase> {
         const ns = this.sioActorNs;
         const addr = ns.idFromName('singleton')
@@ -73,7 +70,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
     }
 
     async createEioSocket(eioSocketId: string, serverSocket: CF.WebSocket): Promise<EioSocket> {
-        const transport = WebsocketTransport.create(serverSocket);
+        const transport = WebSocketTransport.create(serverSocket);
         const sioActorStub = this.getSocketActorStub(eioSocketId)
         const socketState: EioSocketState = {
             eioActorId: this.eioActorState.id,
@@ -103,7 +100,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
         if (!ws) {
             return null
         }
-        const transport = WebsocketTransport.create(ws)
+        const transport = WebSocketTransport.create(ws)
         const revived = new RevivedEioSocket(state, transport) as unknown as EioSocket
         revived.setupOutgoingEvents(state)
         this._liveConnections.set(state.eioSocketId, revived);

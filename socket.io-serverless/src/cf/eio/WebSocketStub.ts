@@ -6,7 +6,7 @@ import debugModule from 'debug';
 const debugLogger = debugModule('sio-serverless:eio:WebSocketStub');
 
 /**
- * stub for ws.WebSocket
+ * stub of ws.WebSocket
  */
 export class WebSocketStub extends EventEmitter {
     static create(cfWebSocket: CF.WebSocket): WsWebSocket & WebSocketStub {
