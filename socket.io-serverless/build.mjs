@@ -93,8 +93,10 @@ const rewireSocketIoImports = {
   setup(build) {
     const packageImportMap = {
       // 'base64id': path.join(sioServerlessRoot, 'node_modules/base64id/index.mjs'),
-      "socket.io": path.join(sioPackagesRoot, "socket.io/lib/index.ts"),
+      // "socket.io": path.join(sioPackagesRoot, "socket.io/lib/index.ts"),
+      // base64id: 'base64id/lib/base64id.js',
       base64id: path.join(
+        // FIXME: resolve from current package
         sioPackagesRoot,
         "engine.io/node_modules/base64id/lib/base64id.js",
       ),
@@ -125,6 +127,13 @@ const rewireSocketIoImports = {
         return {
           path: resolvedPath,
         };
+      }
+      if (args.importer.includes('packages/socket.io/lib/') || args.importer.includes('packages/engine.io/lib/')) {
+        if (['./uws', './userver', './transports/index', './transports', './transports/webtransport', './server',].includes(args.path)) {
+          return {
+            path: path.join(mocksRoot, "empty.js"),
+          }
+        }
       }
     });
 
@@ -164,7 +173,7 @@ function buildRewirePlugin(imports) {
     // debug: path.join(mocksRoot, "debug/index.js"),
     ws: path.join(mocksRoot, "ws/index.js"),
     debug: path.join(___dirname, 'src/debug/index.ts'),
-    accepts: path.join(mocksRoot, "empty.js"),
+    accepts: path.join(mocksRoot, "empty_callable.js"),
     path: path.join(mocksRoot, "empty.js"),
     fs: path.join(mocksRoot, "empty.js"),
     zlib: path.join(mocksRoot, "empty.js"),
@@ -233,6 +242,7 @@ const cfBuildContext = {
     rewireSocketIoImports,
     renameNodeStdlibImports,
     buildRewirePlugin([
+      'accepts',
       "debug",
       "http",
       "net",
@@ -271,6 +281,9 @@ async function reportBuildResult(buildResult) {
     const { imports, bytes } = inputInfo;
     for (const imp of imports) {
       if (imp.path.includes("node_modules/hono/")) {
+        continue;
+      }
+      if (imp.external) {
         continue;
       }
       console.log(imp.kind, inputFile, imp.original, imp.path);

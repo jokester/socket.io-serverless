@@ -7,8 +7,6 @@ import { Hono } from "hono";
 import { lazy } from "../../utils/lazy";
 import { DefaultEngineDelegate, EngineDelegate } from './EngineDelegate';
 import { SocketActorBase } from "../sio/SocketActorBase";
-import { EioSocket } from "./EioSocket";
-import { WebsocketTransport } from "./WebsocketTransport";
 
 const debugLogger = debugModule('sio-serverless:eio:EngineActorBase');
 
