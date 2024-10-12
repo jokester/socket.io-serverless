@@ -21,7 +21,7 @@ Please check the example in [demo-server/](demo-server/).
 
 Write a `wrangler.toml` and run `wrangler dev`
 
-## Features and limitations
+## Features
 
 This lib heavily rewires things to run in and take advantage of Durable Objects.
 
@@ -32,7 +32,7 @@ This lib heavily rewires things to run in and take advantage of Durable Objects.
 
 <!-- [Alarm](https://developers.cloudflare.com/durable-objects/api/alarms/) -->
 
-While it works (in my cases ^{TM}), extra limitations exist:
+### Limitations
 
 - socket.io event callbacks must be configured when Durable Object initializes.
 
@@ -40,7 +40,12 @@ While it works (in my cases ^{TM}), extra limitations exist:
 
 - Only WebSocket transport is supported
 
-- [message acknowledgement](https://socket.io/docs/v4/emitting-events/#acknowledgements) is not supported. <!-- TODO really? -->
+- [message acknowledgement](https://socket.io/docs/v4/emitting-events/#acknowledgements) is not supported.
+
+<!--
+- due to possible hibernation it's hard to do right
+- it's better to not rely on a transport to provide application-level ACK anyway
+-->
 
 - [connection state recovery](https://socket.io/docs/v4/tutorial/step-6) is not supported
     - Each underlying WebSocket connection will occur as independent to engine.io and socket.io
@@ -60,6 +65,7 @@ While it works (in my cases ^{TM}), extra limitations exist:
 <!-- less important ?
 
 - engine.io server middleware
+- engine.io Server and socket.io Server support much fewer options
 
 -->
 
