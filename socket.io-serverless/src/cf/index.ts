@@ -6,6 +6,7 @@ import { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { SocketActorBase } from "./sio/SocketActorBase";
 import { SioServer } from "./sio/SioServer";
 export { createDebugLogger, setEnabledLoggerNamespace } from '../debug'
+import base64id from 'base64id'
 
 export const createEioActor: typeof exports.createEioActor = function <
   Bindings,
@@ -37,3 +38,5 @@ export const createSioActor: typeof exports.createSioActor = function <
     }
   };
 };
+
+export const generateBase64id: typeof exports.generateBase64id = () => base64id.generateId();

@@ -6,6 +6,8 @@ export function createSioActor<Bindings>(options: SioActorOptions<Bindings>): un
 export function createDebugLogger(namespace: string): DebugLogger;
 export function setEnabledLoggerNamespace(namespacePrefixes: string[]): void;
 
+export function generateBase64id(): string
+
 interface EioActorOptions<Bindings> {
     getSocketActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<SocketActorBase>;
 }
