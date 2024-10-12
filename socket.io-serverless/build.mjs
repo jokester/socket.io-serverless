@@ -100,7 +100,7 @@ const rewireSocketIoImports = {
         }
       }
 
-      return null
+      return null;
     });
   },
 };
@@ -147,7 +147,7 @@ function buildRewirePlugin(imports) {
             path: serverlessRewireMap[args.path],
           };
         }
-        return null
+        return null;
       });
     },
   };
@@ -164,6 +164,7 @@ if (!fs.existsSync(outputDir)) {
  */
 
 const cfBuildContext = {
+  logLevel: "info",
   entryPoints: ["src/cf/index.ts"],
   bundle: true,
   platform: "neutral",
@@ -244,10 +245,9 @@ async function reportBuildResult(buildResult) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  buildCf(process.argv.includes("--watch"))
-    .then(reportBuildResult)
-    .catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
+  const started = process.argv.includes("--watch") ? watchCf() : buildCf();
+  started.then(reportBuildResult).catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
 }
