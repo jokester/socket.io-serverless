@@ -62,25 +62,24 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
 
     /**
      * called by EioSocketStub
-     * FIXME should be named 'onServerMessage'
      */
-    async sendMessage(eioSocketId: string, message: string | Buffer): Promise<boolean> {
+    async writeEioMessage(eioSocketId: string, packet: string | Buffer): Promise<boolean> {
         const socketState = this.delegate.recallSocketStateForId(eioSocketId)
         const socket = socketState && this.delegate.reviveEioSocket(socketState)
         if (!socket) {
-            debugLogger('EngineActor#sendMessage', 'socket not found', eioSocketId)
+            debugLogger('EngineActor#writeEioMessage', 'socket not found', eioSocketId)
             return false
         }
         try {
-            socket.write(message);
+            socket.write(packet);
         } catch (e) {
-            debugLogger('EngineActor#sendMessage ERROR', e)
+            debugLogger('EngineActor#writeEioMessage ERROR', e)
             return false
         }
         return true
     }
 
-    async getSocketAlive(eioSocketId: string): Promise<boolean> {
+    async getConnLiveness(eioSocketId: string): Promise<boolean> {
         return !!this.delegate.getCfWebSocket(eioSocketId)
     }
 

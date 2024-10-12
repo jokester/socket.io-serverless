@@ -45,7 +45,7 @@ export class SioServer extends OrigSioServer {
         const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActor)
         debugLogger('CustomSioServer#_sendEioPacket', engineActorStub.id, stub.eioSocketId, msg)
         // @ts-expect-error
-        engineActorStub.sendMessage(stub.eioSocketId, msg).then(
+        engineActorStub.writeEioMessage(stub.eioSocketId, msg).then(
             (sentFromEioActor: boolean) => {
                 // TODO: handle closed connection
                 debugLogger('sent', stub.eioSocketId, sentFromEioActor, msg)
@@ -88,8 +88,8 @@ export class SioServer extends OrigSioServer {
 
     private async reviveClientState(clientId: string, clientState: PersistedSioClientState, recoveredNsps: ReadonlyMap<string, Namespace>,): Promise<boolean> {
         {
-            const eioActorStub = deserializeDoStub(this.engineActorNs, clientState.engineActorId)
-            if (!await eioActorStub.getSocketAlive(clientId)) {
+            const engineActorStub = deserializeDoStub(this.engineActorNs, clientState.engineActorId)
+            if (!await engineActorStub.getConnLiveness(clientId)) {
                 return false
             }
 
