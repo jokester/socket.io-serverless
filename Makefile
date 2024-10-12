@@ -1,8 +1,8 @@
 lib-build:
-	cd socket.io-serverless && node build.mjs
+	pnpm run --filter socket.io-serverless build
 
 lib-watch:
-	cd socket.io-serverless && node build.mjs --watch
+	pnpm run --filter socket.io-serverless build:watch
 
 demo-client-dev:
 	pnpm run --filter ./demo-client dev
