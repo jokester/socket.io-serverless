@@ -1,16 +1,16 @@
-From 786b6b02c194750ef39a90e15ae5305d97e874f4 Mon Sep 17 00:00:00 2001
+From 1f4a58f306ae0522da74bda2a449031296b3d967 Mon Sep 17 00:00:00 2001
 From: Wang Guan <momocraft@gmail.com>
-Date: Mon, 7 Oct 2024 21:47:08 +0900
-Subject: [PATCH] workarounds to upstream socket.io
+Date: Sun, 13 Oct 2024 01:41:00 +0800
+Subject: [PATCH] commit again
 
 ---
  packages/engine.io-client/package.json | 10 +++++-----
- packages/engine.io-parser/package.json |  4 +---
+ packages/engine.io-parser/package.json |  9 +--------
  packages/engine.io/package.json        |  5 -----
  packages/socket.io/lib/client.ts       |  4 ++--
  packages/socket.io/lib/index.ts        |  5 -----
  packages/socket.io/package.json        |  5 -----
- 6 files changed, 8 insertions(+), 25 deletions(-)
+ 6 files changed, 8 insertions(+), 30 deletions(-)
 
 diff --git a/packages/engine.io-client/package.json b/packages/engine.io-client/package.json
 index 0a76e8c..bbf25c6 100644
@@ -36,12 +36,25 @@ index 0a76e8c..bbf25c6 100644
    "homepage": "https://github.com/socketio/socket.io/tree/main/packages/engine.io-client#readme",
    "repository": {
 diff --git a/packages/engine.io-parser/package.json b/packages/engine.io-parser/package.json
-index d661db3..4313aa2 100644
+index d661db3..6066cbd 100644
 --- a/packages/engine.io-parser/package.json
 +++ b/packages/engine.io-parser/package.json
-@@ -33,9 +33,7 @@
+@@ -5,10 +5,6 @@
+   "version": "5.2.3",
+   "main": "./build/cjs/index.js",
+   "module": "./build/esm/index.js",
+-  "exports": {
+-    "import": "./build/esm/index.js",
+-    "require": "./build/cjs/index.js"
+-  },
+   "types": "build/esm/index.d.ts",
+   "scripts": {
+     "compile": "rimraf ./build && tsc && tsc -p tsconfig.esm.json && ./postcompile.sh",
+@@ -31,11 +27,8 @@
+     "build/"
+   ],
    "browser": {
-     "./test/node": "./test/browser",
+-    "./test/node": "./test/browser",
      "./build/esm/encodePacket.js": "./build/esm/encodePacket.browser.js",
 -    "./build/esm/decodePacket.js": "./build/esm/decodePacket.browser.js",
 -    "./build/cjs/encodePacket.js": "./build/cjs/encodePacket.browser.js",
@@ -112,5 +125,5 @@ index 8c52110..49a1e18 100644
    "license": "MIT",
    "homepage": "https://github.com/socketio/socket.io/tree/main/packages/socket.io#readme",
 -- 
-2.46.2
+2.39.5
 
