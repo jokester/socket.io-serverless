@@ -2,7 +2,7 @@ import type * as CF from '@cloudflare/workers-types';
 
 export function persisted<T extends object>(
   create: () => T,
-  state: CF.DurableObjectState
+  state: CF.DurableObjectState,
 ): {
   get value(): T;
   mutate(fn: (v: T) => T): void;

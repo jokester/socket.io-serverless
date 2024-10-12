@@ -1,5 +1,5 @@
 export function lazy<T extends {}>(
-  create: () => T
+  create: () => T,
 ): {
   get value(): T;
 } {

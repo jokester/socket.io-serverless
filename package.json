@@ -10,7 +10,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@types/node": "^20"
+      "@types/node": "^20",
+      "dprint": "^0.47.2"
     }
   }
 }

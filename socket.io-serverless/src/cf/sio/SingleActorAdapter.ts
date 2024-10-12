@@ -1,7 +1,7 @@
-import type { Namespace } from "socket.io/lib";
-import { Adapter } from "socket.io-adapter/lib/in-memory-adapter";
-import debugModule from "debug";
-import type { Persister } from "./Persister";
+import type { Namespace } from 'socket.io/lib';
+import { Adapter } from 'socket.io-adapter/lib/in-memory-adapter';
+import debugModule from 'debug';
+import type { Persister } from './Persister';
 
 const debugLogger = debugModule('sio-serverless:sio:SingleActorAdapter');
 
@@ -10,20 +10,19 @@ const debugLogger = debugModule('sio-serverless:sio:SingleActorAdapter');
  * - handles state recovery before/after DO hibernation
  */
 export abstract class SingleActorAdapter extends Adapter {
-    constructor(nsp: Namespace) {
-        super(nsp);
-        debugLogger('SingleActorAdapter#constructor', nsp.name)
-    }
+  constructor(nsp: Namespace) {
+    super(nsp);
+    debugLogger('SingleActorAdapter#constructor', nsp.name);
+  }
 
-    abstract get persister(): Persister
+  abstract get persister(): Persister;
 
-    /**
-     * called when namespace is closed
-     * e.g. serverOpts.cleanupEmptyChildNamespaces
-     */
-    override close() {
-        debugLogger('Namespace close', this.nsp.name)
-        this.persister.onRemoveNamespace(this.nsp.name)
-    }
-
+  /**
+   * called when namespace is closed
+   * e.g. serverOpts.cleanupEmptyChildNamespaces
+   */
+  override close() {
+    debugLogger('Namespace close', this.nsp.name);
+    this.persister.onRemoveNamespace(this.nsp.name);
+  }
 }

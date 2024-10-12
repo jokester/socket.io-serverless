@@ -1,8 +1,31 @@
 {
   "name": "socket.io-serverless",
   "description": "A custom socket.io build to run in Cloudflare workers.",
+  "version": "0.1.0",
   "type": "module",
-  "dependencies": {
+  "dependencies": {},
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "build:watch": "node build.mjs --watch",
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src",
+    "format": "dprint fmt",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --watch --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240903.0",
+    "@tsconfig/strictest": "^2.0.5",
+    "@types/base64id": "^2.0.2",
+    "@types/node": "^20",
+    "@types/debug": "^4.1.12",
+    "@types/ws": "^8",
+    "dprint": "*",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6",
     "@jokester/ts-commonutil": "^0.6.0",
     "base64id": "^2.0.0",
     "debug": "^4.3.7",
@@ -10,14 +33,5 @@
     "engine.io-parser": "workspace:*",
     "socket.io": "workspace:*",
     "socket.io-adapter": "workspace:*"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240903.0",
-    "@tsconfig/strictest": "^2.0.5",
-    "@types/base64id": "^2.0.2",
-    "@types/debug": "^4.1.12",
-    "@types/ws": "^8",
-    "esbuild": "^0.24.0",
-    "typescript": "^5.6"
   }
 }

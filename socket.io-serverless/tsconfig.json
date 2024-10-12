@@ -3,6 +3,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "noEmit": true,
+    "skipLibCheck": true,
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "typeRoots": [
@@ -10,5 +11,7 @@
       "node_modules/@cloudflare/workers-types"
     ],
     "moduleResolution": "bundler"
-  }
+  },
+  "include": ["src/cf/index.ts"],
+  "exclude": ["../socket.io"]
 }
