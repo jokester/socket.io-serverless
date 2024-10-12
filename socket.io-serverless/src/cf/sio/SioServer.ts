@@ -92,9 +92,6 @@ export class SioServer extends OrigSioServer {
             if (!await engineActorStub.getConnLiveness(clientId)) {
                 return false
             }
-
-            // TODO: call isAlive()
-            // const isAlive = await this.engineActorNs.
         }
         const conn = new EioSocketStub(clientId, clientState.engineActorId, this)
         this.connStubs.set(conn.eioSocketId, conn)
@@ -104,7 +101,7 @@ export class SioServer extends OrigSioServer {
             const nsp = recoveredNsps.get(nspName)
 
             if (!nsp) {
-                debugLogger('WARNING nsp was referenced but not recreated', nspName)
+                debugLogger('WARNING nsp was referenced but not recreated', clientId, nspName)
                 return
             }
 
@@ -117,29 +114,36 @@ export class SioServer extends OrigSioServer {
                 data: null
             })
 
-            // modified version of Namespace#_doConnect , to not call Socket#_onconnect
-            // this is needed to not send
-            nsp.sockets.set(socket.id, socket)
-            // @ts-expect-error
-            nsp.emitReserved("connect", socket);
-            // @ts-expect-error
-            nsp.emitReserved("connection", socket);
+            {
+                // replaces Namespace#_doConnect
+                nsp.sockets.set(socket.id, socket)
+                // @ts-expect-error
+                nsp.emitReserved("connect", socket);
+                // @ts-expect-error
+                nsp.emitReserved("connection", socket);
+                // not calling Socket#_onconnect
+            }
 
-            // replay Socket#_onconnect
-            socket.connected = true
-            socket.join(socket.id)
+            {
+                // replaces Socket#_onconnect
+                // this is needed to not send Packet.CONNECTED to all socket again
+                socket.connected = true
+                socket.join(socket.id)
+            }
 
-            // replay: Client#doConnect
-            // @ts-expect-error
-            client.sockets.set(socket.id, socket)
-            // @ts-expect-error
-            client.nsps.set(nsp.name, socket)
+            {
+                // replaces Client#doConnect
+                // @ts-expect-error
+                client.sockets.set(socket.id, socket)
+                // @ts-expect-error
+                client.nsps.set(nsp.name, socket)
+            }
 
             // @ts-expect-error
             debugLogger('recreated sio.Socket', socket.id, socket.pid)
         })
         // @ts-expect-error
-        debugLogger('recreated SioClient', client.conn.eioSocketId, Array.from(client.nsps.keys()))
+        debugLogger('recreated SioClient', conn.eioSocketId /* equals private client.id */, Array.from(client.nsps.keys()))
         return true
     }
 
