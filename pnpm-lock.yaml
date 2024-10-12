@@ -178,6 +178,9 @@ importers:
       engine.io:
         specifier: workspace:*
         version: link:../socket.io/packages/engine.io
+      engine.io-parser:
+        specifier: workspace:*
+        version: link:../socket.io/packages/engine.io-parser
       socket.io:
         specifier: workspace:*
         version: link:../socket.io/packages/socket.io

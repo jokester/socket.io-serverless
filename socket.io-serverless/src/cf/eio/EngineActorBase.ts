@@ -3,6 +3,8 @@ import type * as CF from '@cloudflare/workers-types';
 import { DurableObject } from 'cloudflare:workers';
 import { DefaultEngineDelegate, EngineDelegate } from './EngineDelegate';
 import { SocketActorBase } from "../sio/SocketActorBase";
+// import { encodePacket, Packet, PacketType } from "engine.io-parser/lib";
+import { PACKET_TYPES } from 'engine.io-parser/lib/commons'
 
 const debugLogger = debugModule('sio-serverless:eio:EngineActorBase');
 
@@ -19,7 +21,8 @@ export interface EioSocketState {
     ws?: CF.WebSocket
 }
 
-const ALARM_INTERVAL = 5e3
+const ALARM_INTERVAL = 30e3;
+const ENCODED_PING = PACKET_TYPES['ping']
 
 export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject {
 
@@ -35,10 +38,21 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
 
     override async alarm(): Promise<void> {
         debugLogger('waken up by alarm')
+        const wokenAt = Date.now()
+        // const encoded = await new Promise<string>(f => encodePacket({ type: 'ping' }, false, f))
         for (const w of this.state.getWebSockets()) {
-            debugLogger('would send engine.io ping', w.extensions)
+            try {
+                w.send(ENCODED_PING);
+                // NOT setting auto reponse pair:
+                // assuming client will send pong before current DO enters hibernation again.
+            } catch (e) {
+                console.error('EngineActor#alarm() error send engine.io PING', e)
+            }
         }
-        await this.state.storage.setAlarm(Date.now() + ALARM_INTERVAL)
+        if (Date.now() > wokenAt + ALARM_INTERVAL / 2) {
+            console.warn("EngineActor#alarm(): Unexpectingly slow sending ping to engine.io clients. Maybe too connections.")
+        }
+        await this.state.storage.setAlarm(wokenAt + ALARM_INTERVAL)
     }
 
     // @ts-expect-error

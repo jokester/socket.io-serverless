@@ -7,6 +7,7 @@
     "base64id": "^2.0.0",
     "debug": "^4.3.7",
     "engine.io": "workspace:*",
+    "engine.io-parser": "workspace:*",
     "socket.io": "workspace:*",
     "socket.io-adapter": "workspace:*"
   },

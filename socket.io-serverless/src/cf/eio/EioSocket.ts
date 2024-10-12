@@ -11,8 +11,11 @@ function createStubEioServer() {
     const server = new EventEmitter();
     Object.assign(server, {
         opts: {
-            pingInterval: 10_000,
-            pingTimeout: 20_000,
+            /**
+             * EngineActor gets waken up every 30s by alarm. Client should receive 'ping' at that interval
+             */
+            pingInterval: 30_000,
+            pingTimeout: 15_000,
         } as eio.ServerOptions,
         upgrades: () => [],
     });
@@ -56,6 +59,11 @@ export class EioSocket extends Socket {
             refresh() {
             }
         }
+    }
+
+    onPingTimer() {
+        // @ts-expect-error
+        this.sendPacket('ping');
     }
 
     override resetPingTimeout() {
