@@ -37,22 +37,19 @@ export class SioServer extends OrigSioServer {
         },);
     }
 
-    _sendEioPacket(stub: EioSocketStub, msg: string | Buffer) {
+    async writeEioMessage(stub: EioSocketStub, msg: string | Buffer): Promise<void> {
         /**
          * NOTE the ownerActor received from RPC lacks something
          * and needs to be before used to call RPC
          */
         const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActor)
-        debugLogger('CustomSioServer#_sendEioPacket', engineActorStub.id, stub.eioSocketId, msg)
-        // @ts-expect-error
-        engineActorStub.writeEioMessage(stub.eioSocketId, msg).then(
-            (sentFromEioActor: boolean) => {
-                // TODO: handle closed connection
-                debugLogger('sent', stub.eioSocketId, sentFromEioActor, msg)
-            },
-            (e: unknown) => {
-                debugLogger('failed to send', stub.eioSocketId, msg, e)
-            })
+        debugLogger('SioServer#writeEioMessage', engineActorStub.id, stub.eioSocketId, msg)
+
+        const written = await engineActorStub.writeEioMessage(stub.eioSocketId, msg)
+        if (!written) {
+            debugLogger('SioServer#writeEioMessage FAIL')
+            throw new Error(`Error EngineActor#writeEioMessage`)
+        }
     }
 
     async restoreState() {

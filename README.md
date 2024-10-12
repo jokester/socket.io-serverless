@@ -40,14 +40,27 @@ While it works (in my cases ^{TM}), extra limitations exist:
 
 - Only WebSocket transport is supported
 
+- [message acknowledgement](https://socket.io/docs/v4/emitting-events/#acknowledgements) is not supported. <!-- TODO really? -->
+
+- [connection state recovery](https://socket.io/docs/v4/tutorial/step-6) is not supported
+    - Each underlying WebSocket connection will occur as independent to engine.io and socket.io
+
 - Defining parent namespace with a function is not supported
 
- <!-- Allowing so would make it impossible to hydrate in new DO lifetime -->
+- socket.io server middleware and namespace middleware is *not tested*
+
+ <!-- Allowing so would make it impossible to hydrate in new DO lifetime // TODO: really? -->
 
 - Rooms
 
-<!-- Unlike other harder limitations this should be doable. I just don't have a plan yet -->
+- Load splitting with multiple running instances. Currently 1 DO to run engine.io code, and 1 to run socket.io code.
 
-- Load splitting with multiple running instances. Currently 1 DO to run engine.io code, and 
+<!-- Unlike other harder limitations the last 2 should be doable. I just don't have a plan yet -->
+
+<!-- less important ?
+
+- engine.io server middleware
+
+-->
 
 ## Internal stuff

@@ -43,10 +43,17 @@ export class EioSocketStub extends EventEmitter {
         }
     }
 
-    write(packet: string | Buffer, opts: unknown) {
-        debugLogger('EioSocketStub#write', packet, opts)
+    /**
+     * works in places of real eio.Socket#write()
+     * impled by forwarding through SioServer to EngineActor
+     */
+    write(packet: string | Buffer, opts?: unknown, callback?: unknown) {
+        debugLogger('EioSocketStub#write', packet, opts, callback)
         // FIXME can we keep a reference in this object?
-        this.server._sendEioPacket(this, packet)
+        this.server.writeEioMessage(this, packet).catch(e => {
+            debugLogger('EioSocketStub#write ERROR', e)
+            this.emit('error', e)
+        })
     }
 
     /**

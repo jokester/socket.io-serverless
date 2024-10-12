@@ -10,19 +10,18 @@ interface PersistedSioServerStateNamespaces {
 }
 
 interface PersistedSioServerStateClients {
-  clientIds: Set<string>; // equal to eioSocket.id
+  clientIds: Set<string>; // Client#id equal to eioSocket.id
 }
 
 export interface PersistedSioClientState {
-  // TODO: persist this, maybe in Client#constructor
   clientId: string;
   engineActorId: CF.DurableObjectId;
-  // TODO: persist this, maybe in Adapter
   namespaces: Map<
     /* concrete nsp.name*/ string,
     {
       socketId: string;
       socketPid: string;
+      // TODO maybe persist rooms too (would require hooking in Adapter)
       rooms: string[];
     }
   >;
@@ -120,9 +119,16 @@ export class Persister {
     const clientId = stub.eioSocketId;
     await this.replaceGlobalState<PersistedSioServerStateClients>(
       KEY_GLOBAL_STATE_CLIENTS,
-      (prev) => ({
-        clientIds: new Set([...(prev?.clientIds ?? []), clientId]),
-      })
+      (prev) => {
+        if (prev?.clientIds) {
+          prev.clientIds.add(clientId)
+          return prev;
+        } else {
+          return {
+            clientIds: new Set([clientId])
+          }
+        }
+      }
     );
     await this.replaceClientState(clientId, (prev) => ({
       clientId,
@@ -151,6 +157,7 @@ export class Persister {
     debugLogger("onSocketConnect", clientId, socket.nsp.name);
 
     await this.replaceClientState(clientId, (prev) => {
+      // HOPEFULLY this will not be in parallel onNewClient
       prev!.namespaces.set(socket.nsp.name, {
         socketId: socket.id,
         // @ts-expect-error use of private
