@@ -1,9 +1,9 @@
 import debugModule from 'debug'
 import type * as CF from '@cloudflare/workers-types';
-import {EioSocketState} from "./EngineActorBase";
-import type {SocketActorBase} from "../sio/SocketActorBase";
-import {EioSocket, RevivedEioSocket} from "./EioSocket";
-import {WebSocketTransport} from "./WebSocketTransport";
+import { EioSocketState } from "./EngineActorBase";
+import type { SocketActorBase } from "../sio/SocketActorBase";
+import { EioSocket, RevivedEioSocket } from "./EioSocket";
+import { WebSocketTransport } from "./WebSocketTransport";
 
 const debugLogger = debugModule('sio-serverless:eio:EngineDelegate');
 
@@ -14,22 +14,22 @@ export interface EngineDelegate {
     /**
      * extension point for load-balancing
      */
-    getSocketActorStub(sessionId: string): 
-    CF.DurableObjectStub<SocketActorBase>
+    getSocketActorStub(sessionId: string):
+        CF.DurableObjectStub<SocketActorBase>
     // called on outgoing client messages
     recallSocketStateForId(eioSocketId: string): null | EioSocketState;
     // called on incoming client messages
     recallSocketStateForConn(ws: CF.WebSocket): null | EioSocketState
     createEioSocket(eioSocketId: string, serverSocket: CF.WebSocket): Promise<EioSocket>
     reviveEioSocket(state: EioSocketState): null | EioSocket
-    getCfWebSocket(eioSocketId: string) : null | CF.WebSocket
+    getCfWebSocket(eioSocketId: string): null | CF.WebSocket
 }
 
 export class DefaultEngineDelegate implements EngineDelegate {
 
     private readonly _liveConnections = new Map<string, EioSocket>()
 
-    constructor(private readonly eioActorState: CF.DurableObjectState, 
+    constructor(private readonly eioActorState: CF.DurableObjectState,
         private readonly sioActorNs: CF.DurableObjectNamespace<SocketActorBase>) {
     }
 
@@ -95,7 +95,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
                 return alive
             }
         }
-        const ws  = this.getCfWebSocket(state.eioSocketId)
+        const ws = this.getCfWebSocket(state.eioSocketId)
         if (!ws) {
             return null
         }
@@ -107,7 +107,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
         return revived
     }
 
-    getCfWebSocket(eioSocketId: string) : null | CF.WebSocket {
+    getCfWebSocket(eioSocketId: string): null | CF.WebSocket {
 
         const tag = `sid:${eioSocketId}`
 

@@ -145,7 +145,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         this.state.acceptWebSocket(serverSocket, tags);
         debugLogger('accepted ws connection', sid, tags);
         wait(0.1e3).then(() => this.delegate.createEioSocket(sid, serverSocket)).catch(e => {
-            // without this day, the send of engine.io 'open' packet may fail silently
+            // without this delay, the send of engine.io 'open' packet may fail silently
             console.error('EngineActorBase#fetch() error creating EioSocket', e);
         })
         return new self.Response(null, { status: 101, webSocket: clientSocket });

@@ -1,6 +1,6 @@
-import {EventEmitter} from "events";
+import { EventEmitter } from "events";
 import type * as CF from "@cloudflare/workers-types";
-import type {WebSocket as WsWebSocket} from "ws";
+import type { WebSocket as WsWebSocket } from "ws";
 import debugModule from 'debug';
 
 const debugLogger = debugModule('sio-serverless:eio:WebSocketStub');

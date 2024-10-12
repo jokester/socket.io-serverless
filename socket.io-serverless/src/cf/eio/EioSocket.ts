@@ -28,6 +28,7 @@ function createStubEioServer() {
  * - error
  * - close
  */
+// @ts-expect-error
 export class EioSocket extends Socket {
     constructor(private readonly socketState: EioSocketState, private readonly _transport: WebSocketTransport) {
         super(socketState.eioSocketId, createStubEioServer() as any, _transport, null!, 4);
@@ -51,10 +52,12 @@ export class EioSocket extends Socket {
     private schedulePing() {
         // rewrite to workaround incompatible 'timer' polyfill in CF worker
         // (this also removes server-initiated ping timeout detection in protocol v4)
+        // @ts-expect-error
         this.pingTimeoutTimer = {
             refresh() {
             }
         }
+        // @ts-expect-error
         this.pingIntervalTimer = {
             refresh() {
             }
@@ -87,6 +90,7 @@ export class EioSocket extends Socket {
     }
 }
 
+// @ts-expect-error
 export class RevivedEioSocket extends EioSocket {
     protected override onOpen() {
         // when this is revived, monkey patch the method
