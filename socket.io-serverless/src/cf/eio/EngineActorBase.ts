@@ -109,8 +109,7 @@ function createHandler(actor: EngineActorBase, delegate: EngineDelegate) {
             }
 
             const socketId = ctx.req.query('eio_sid')!
-            if (socketId?.length !== 10) {
-                // FIXME: should limit minimal length instaed
+            if (!(typeof socketId === 'string' && socketId.length >= 10)) {
                 return new Response(null, {
                     status: 400,
                     statusText: `invalid eio_sid: ${socketId}`,
