@@ -27,3 +27,4 @@ dist-ssr
 .wrangler
 .yarn
 *.tgz
+/socket.io-serverless/README.md
