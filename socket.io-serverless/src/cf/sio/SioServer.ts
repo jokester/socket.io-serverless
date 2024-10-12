@@ -134,7 +134,6 @@ export class SioServer extends OrigSioServer {
          * state changes from now on get persisted
          */
         this.on('new_namespace', nsp => {
-            const nspNames = [...this._nsps.keys()]
             this.persister.onNewNamespace(nsp.name)
             nsp.on('connection', (socket: Socket) => {
                 this.persister.onSocketConnect(socket)
@@ -173,7 +172,7 @@ export class SioServer extends OrigSioServer {
 
     onEioData(eioSocketId: string, data: any) {
         if (!this.connStubs.has(eioSocketId)) {
-            console.warn(new Error(`eio socket ${eioSocketId} not found`))
+            console.warn(`SioServer#onEioData() eio socket ${eioSocketId} not found`)
             return
         }
         this.connStubs.get(eioSocketId)!.emit('data', data)
@@ -181,7 +180,7 @@ export class SioServer extends OrigSioServer {
 
     onEioClose(eioSocketId: string, code: number, reason: string) {
         if (!this.connStubs.has(eioSocketId)) {
-            console.warn(new Error(`eio socket ${eioSocketId} not found`))
+            console.warn(`SioServer#onEioClose() eio socket ${eioSocketId} not found`)
             return
         }
         this.connStubs.get(eioSocketId)!.emit('close', reason, `code: ${code}`)
@@ -189,7 +188,7 @@ export class SioServer extends OrigSioServer {
 
     onEioError(eioSocketId: string, error: any) {
         if (!this.connStubs.has(eioSocketId)) {
-            throw new Error(`eio socket ${eioSocketId} not found`)
+            console.warn(`SioServer#onEioError() eio socket ${eioSocketId} not found`)
         }
         this.connStubs.get(eioSocketId)!.emit('error', error)
     }

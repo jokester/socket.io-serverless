@@ -5,6 +5,7 @@ import { DefaultEngineDelegate, EngineDelegate } from './EngineDelegate';
 import { SocketActorBase } from "../sio/SocketActorBase";
 // import { encodePacket, Packet, PacketType } from "engine.io-parser/lib";
 import { PACKET_TYPES } from 'engine.io-parser/lib/commons'
+import { wait } from '@jokester/ts-commonutil/lib/concurrency/timing';
 
 const debugLogger = debugModule('sio-serverless:eio:EngineActorBase');
 
@@ -37,8 +38,8 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
     abstract getSocketActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<SocketActorBase>
 
     override async alarm(): Promise<void> {
-        debugLogger('waken up by alarm')
         const wokenAt = Date.now()
+        debugLogger('EngineActor#alarm()', wokenAt)
         // const encoded = await new Promise<string>(f => encodePacket({ type: 'ping' }, false, f))
         for (const w of this.state.getWebSockets()) {
             try {
@@ -143,7 +144,10 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         const tags = [`sid:${sid}`];
         this.state.acceptWebSocket(serverSocket, tags);
         debugLogger('accepted ws connection', sid, tags);
-        await this.delegate.createEioSocket(sid, serverSocket)
+        wait(0.1e3).then(() => this.delegate.createEioSocket(sid, serverSocket)).catch(e => {
+            // without this day, the send of engine.io 'open' packet may fail silently
+            console.error('EngineActorBase#fetch() error creating EioSocket', e);
+        })
         return new self.Response(null, { status: 101, webSocket: clientSocket });
     }
 }

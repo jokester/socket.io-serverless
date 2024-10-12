@@ -7,9 +7,11 @@ import type { Server } from 'socket.io/lib'
 const debugLogger = createDebugLogger('socket.io-serverless:demo:cf-main');
 
 setEnabledLoggerNamespace([
-    // 'engine:',
-    // 'socket.io:',
-    'sio-serverless:eio:',
+    'engine:',
+    'socket.io:',
+    'sio-serverless',
+    'sio-serverless:eio:EngineActor',
+    'sio-serverless:sio:SioServer',
     // 'sio-serverless:sio:Persister',
 ]);
 

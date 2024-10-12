@@ -36,8 +36,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
     /**
      * @note in future this can be overridden for load-balancing
      */
-    getSocketActorStub(sessionId: string):
-        CF.DurableObjectStub<SocketActorBase> {
+    getSocketActorStub(sessionId: string): CF.DurableObjectStub<SocketActorBase> {
         const ns = this.sioActorNs;
         const addr = ns.idFromName('singleton')
         return ns.get(addr)
@@ -77,7 +76,7 @@ export class DefaultEngineDelegate implements EngineDelegate {
             eioSocketId,
             socketActorStub: sioActorStub,
         }
-        const created = new EioSocket(socketState, transport);
+        const created = new EioSocket(socketState, transport); // this send the 'open' packet
 
         // @ts-ignore
         await sioActorStub.onEioSocketConnection(socketState.eioActorId, eioSocketId)
