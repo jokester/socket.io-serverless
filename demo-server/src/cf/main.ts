@@ -1,5 +1,5 @@
 import * as forwardEverything from "../app/forward-everything";
-import { createEioActor, createSioActor, createDebugLogger, setEnabledLoggerNamespace } from "socket.io-serverless/dist/cf.js";
+import { createEioActor, createSioActor, createDebugLogger, setEnabledLoggerNamespace, generateBase64id } from "socket.io-serverless/dist/cf.js";
 import { Hono } from 'hono';
 import type { DurableObjectNamespace } from '@cloudflare/workers-types';
 import type { Server } from 'socket.io/lib'
@@ -50,11 +50,11 @@ export const workerApp = new Hono<{ Bindings: WorkerBindings }>().get(
         const engineActorStub = ctx.env.engineActor.get(actorId);
 
         /**
-         * generate session id for
+         * generate session id, it will be used as
          * 1. eio.Socket#id
-         * 2. socket.io Socket
+         * 2. socket.io Client#id
          */
-        const sessionId = (Math.random()).toString(16).slice(2, 12)
+        const sessionId = generateBase64id()
         // @ts-ignore
         const res = await engineActorStub.fetch(`https://eioServer.internal/socket.io/?eio_sid=${sessionId}`, ctx.req.raw);
         // @ts-ignore
