@@ -34,7 +34,8 @@ This lib heavily rewires things to run in and take advantage of Durable Objects.
 
 ### Limitations
 
-- socket.io event callbacks must be configured when Durable Object initializes.
+- socket.io `Server` must be configured with in `onServerCreated` callback.
+    - dynamic configuration will not work as in socket.io : only a subset of states (client ids and namespace names) gets restored after hibernation
 
 <!-- otherwise they won't be recovered after hibernation -->
 
@@ -44,7 +45,7 @@ This lib heavily rewires things to run in and take advantage of Durable Objects.
 
 <!--
 - due to possible hibernation it's hard to do right
-- it's better to not rely on a transport to provide application-level ACK anyway
+- it's better to not expect a transport to provide application-level ACK anyway
 -->
 
 - [connection state recovery](https://socket.io/docs/v4/tutorial/step-6) is not supported
@@ -56,9 +57,9 @@ This lib heavily rewires things to run in and take advantage of Durable Objects.
 
  <!-- Allowing so would make it impossible to hydrate in new DO lifetime // TODO: really? -->
 
-- Rooms
+- [Rooms](https://socket.io/docs/v4/rooms/) is not supported
 
-- Load splitting with multiple running instances. Currently 1 DO to run engine.io code, and 1 to run socket.io code.
+- Load splitting like cluster-adapter is not supported. Currently this library uses a single DO to run engine.io code, and another to run socket.io code.
 
 <!-- Unlike other harder limitations the last 2 should be doable. I just don't have a plan yet -->
 
@@ -69,4 +70,7 @@ This lib heavily rewires things to run in and take advantage of Durable Objects.
 
 -->
 
-## Internal stuff
+### License
+
+BSD
+
