@@ -79,6 +79,16 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
         return true
     }
 
+    async closeEioConn(eioSocketId: string): Promise<boolean> {
+        const conn = this.delegate.getCfWebSocket(eioSocketId)
+        if (!conn) {
+            debugLogger('EngineActor#closeEioConn WebSocket not found', eioSocketId)
+            return false
+        }
+        conn.close();
+        return true;
+    }
+
     async getConnLiveness(eioSocketId: string): Promise<boolean> {
         return !!this.delegate.getCfWebSocket(eioSocketId)
     }

@@ -1,4 +1,3 @@
-// @ts-ignore
 import { Server as OrigSioServer, Socket, Namespace } from 'socket.io/lib/index';
 // import type {Client} from 'socket.io/lib/client'
 import type * as CF from "@cloudflare/workers-types";
@@ -35,21 +34,6 @@ export class SioServer extends OrigSioServer {
             // connectionStateRecovery: undefined,
             cleanupEmptyChildNamespaces: true,
         },);
-    }
-
-    async writeEioMessage(stub: EioSocketStub, msg: string | Buffer): Promise<void> {
-        /**
-         * NOTE the ownerActor received from RPC lacks something
-         * and needs to be before used to call RPC
-         */
-        const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActor)
-        debugLogger('SioServer#writeEioMessage', engineActorStub.id, stub.eioSocketId, msg)
-
-        const written = await engineActorStub.writeEioMessage(stub.eioSocketId, msg)
-        if (!written) {
-            debugLogger('SioServer#writeEioMessage FAIL')
-            throw new Error(`Error EngineActor#writeEioMessage`)
-        }
     }
 
     async restoreState() {
@@ -212,10 +196,30 @@ export class SioServer extends OrigSioServer {
         this.connStubs.get(eioSocketId)!.emit('error', error)
     }
 
-    closeConn(stub: EioSocketStub) {
+    async writeEioMessage(stub: EioSocketStub, msg: string | Buffer): Promise<void> {
+        /**
+         * NOTE the ownerActor received from RPC lacks something
+         * and needs to be before used to call RPC
+         */
+        const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActor)
+        debugLogger('SioServer#writeEioMessage', engineActorStub.id, stub.eioSocketId, msg)
 
+        const succeed = await engineActorStub.writeEioMessage(stub.eioSocketId, msg)
+        if (!succeed) {
+            debugLogger('SioServer#writeEioMessage FAIL')
+            throw new Error(`Error EngineActor#writeEioMessage`)
+        }
     }
 
+    async closeEioConn(stub: EioSocketStub) {
+        const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActor)
+        debugLogger('SioServer#closeEioConn', engineActorStub.id, stub.eioSocketId)
+
+        const succeed = await engineActorStub.closeEioConn(stub.eioSocketId);
+        if (!succeed) {
+            debugLogger('SioServer#closeEioConn FAIL')
+        }
+    }
 }
 
 // @ts-expect-error

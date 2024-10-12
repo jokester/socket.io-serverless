@@ -1,20 +1,21 @@
-import {Client as OrigSioClient} from "socket.io/lib/client";
-import debugModule  from "debug";
-import {SioServer} from "./SioServer";
-import {EioSocketStub} from "./EioSocketStub";
+import { Client as OrigSioClient } from "socket.io/lib/client";
+import { EventsMap } from "socket.io/lib/typed-events";
+import debugModule from "debug";
+import { SioServer } from "./SioServer";
+import { EioSocketStub } from "./EioSocketStub";
 
 const debugLogger = debugModule('sio-serverless:sio:SioClient');
-/**
- * Not supported: connectTimeout
- */
-export class SioClient extends OrigSioClient {
-    constructor(private readonly server: SioServer, readonly conn: EioSocketStub) {
+
+// @ts-expect-error this.conn is not a eio.Socket
+export class SioClient extends OrigSioClient<EventsMap, EventsMap, EventsMap> {
+    constructor(private override readonly server: SioServer, override readonly conn: EioSocketStub) {
         super(server, conn);
         debugLogger('CustomSioClient#constructor', conn.eioSocketId)
     }
 
     /** rewrites OrigSioClient#setup() */
-    protected setup() {
+    protected override setup() {
+        // @ts-expect-error use of private
         this.decoder.on("decoded", packet => {
             debugLogger('CustomSioClient#ondecoded', packet)
             // @ts-expect-error calling private method

@@ -1,19 +1,20 @@
-import {EventEmitter} from "events";
+import { EventEmitter } from "events";
 import type * as CF from "@cloudflare/workers-types";
-import {SioServer} from "./SioServer";
-import debugModule   from "debug";
+import type * as http from 'http';
+import * as eio from 'engine.io/lib/engine.io'
+import { SioServer } from "./SioServer";
+import debugModule from "debug";
 
 const debugLogger = debugModule('sio-serverless:sio:EioSocketStub');
 
-/**
- * replaces eio.Socket
- */
-export class EioSocketStub extends EventEmitter {
+// eio.Socket stub to socket.io code
+// @ts-expect-error
+export class EioSocketStub extends EventEmitter implements eio.Socket {
     constructor(readonly eioSocketId: string, readonly ownerActor: CF.DurableObjectId, readonly server: SioServer) {
         super()
     }
 
-    get request(): {} {
+    get request(): http.IncomingMessage {
         /**
          * queried by
          * sio.Socket#buildHandshake()
@@ -22,10 +23,10 @@ export class EioSocketStub extends EventEmitter {
             remoteAddress: 'unknown',
             headers: {},
             connection: {
+                // @ts-expect-error maybe non-standard property
                 encrypted: true,
             },
             url: `https://localhost:5173/dummy`
-
         }
     }
 
@@ -33,11 +34,12 @@ export class EioSocketStub extends EventEmitter {
         return 4
     }
 
-    get readyState(): string {
+    get readyState(): 'open' {
         return 'open'
     }
 
-    get transport() {
+    get transport(): eio.Transport {
+        // @ts-ignore
         return {
             writable: true
         }
@@ -51,9 +53,10 @@ export class EioSocketStub extends EventEmitter {
         debugLogger('EioSocketStub#write', packet, opts, callback)
         // FIXME can we keep a reference in this object?
         this.server.writeEioMessage(this, packet).catch(e => {
-            debugLogger('EioSocketStub#write ERROR', e)
-            this.emit('error', e)
+            debugLogger('EioSocketStub#write ERROR', e);
+            this.emit('error', e); // this will eventually cause this.close()
         })
+        return this;
     }
 
     /**
@@ -63,9 +66,7 @@ export class EioSocketStub extends EventEmitter {
      * 3. sio.Server#close() which is not called in worker
      */
     close() {
-        this.server.closeConn(this)
-        // this.emit('close', 'EioSocketStub#close()')
-        // TODO: should this call EioWorker to close the real conn?
+        this.server.closeEioConn(this)
     }
 }
 
