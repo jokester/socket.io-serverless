@@ -55,13 +55,11 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
     if (Date.now() > wokenAt + ALARM_INTERVAL / 2) {
       console.warn('EngineActor#alarm(): Unexpectingly slow sending ping to engine.io clients. Maybe too connections.');
     }
-    await this.alarmTimer.refresh(wokenAt).catch(e => {
-      debugLogger('error setting alarm in alarm()', e);
-    });
+    await this.ctx.storage.setAlarm(wokenAt + ALARM_INTERVAL);
   }
 
   // @ts-expect-error
-  override async webSocketMessage(ws: CF.WebSocket, message: string | ArrayBuffer) {
+  override webSocketMessage(ws: CF.WebSocket, message: string | ArrayBuffer) {
     debugLogger('EngineActor#webSocketMessage', message);
     const socketState = this.delegate.recallSocketStateForConn(ws);
     const socket = socketState && this.delegate.reviveEioSocket(socketState);
@@ -70,7 +68,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
   }
 
   // @ts-expect-error
-  override async webSocketClose(ws: CF.WebSocket, code: number, reason: string, wasClean: boolean) {
+  override webSocketClose(ws: CF.WebSocket, code: number, reason: string, wasClean: boolean) {
     debugLogger('EngineActor#webSocketClose', code, reason, wasClean);
     const socketState = this.delegate.recallSocketStateForConn(ws);
     const socket = socketState && this.delegate.reviveEioSocket(socketState);
@@ -79,7 +77,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
   }
 
   // @ts-expect-error
-  override async webSocketError(ws: CF.WebSocket, error: unknown) {
+  override webSocketError(ws: CF.WebSocket, error: unknown) {
     debugLogger('EngineActor#webSocketError', error);
     const socketState = this.delegate.recallSocketStateForConn(ws);
     const socket = socketState && this.delegate.reviveEioSocket(socketState);
