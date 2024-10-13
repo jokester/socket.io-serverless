@@ -1,7 +1,7 @@
 {
   "name": "socket.io-serverless",
   "description": "A custom socket.io build to run in Cloudflare workers.",
-  "version": "0.1.0-beta1",
+  "version": "0.1.0-beta2",
   "type": "module",
   "dependencies": {},
   "files": [
@@ -13,7 +13,7 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "prepack": "cp -v ../README.md .",
+    "prepack": "node build.mjs && cp -v ../README.md .",
     "build": "node build.mjs",
     "build:watch": "node build.mjs --watch",
     "lint": "eslint src",

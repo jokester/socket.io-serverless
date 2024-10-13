@@ -25,8 +25,7 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
   async onEioSocketConnection(actorAddr_: string, socketId: string) {
     debugLogger('SocketActor#onEioSocketConnection', actorAddr_, socketId);
     const sioServer = await this.sioServer;
-    const actorAddr = this.engineActorNs.idFromString(actorAddr_);
-    const stubConn = new EioSocketStub(socketId, actorAddr, sioServer);
+    const stubConn = new EioSocketStub(socketId, actorAddr_, sioServer);
     await sioServer.onEioConnection(stubConn);
   }
 
