@@ -11,34 +11,39 @@ import { SingleActorAdapter } from './SingleActorAdapter';
 const debugLogger = debug('sio-serverless:sio:SocketActor');
 
 export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<Bindings> {
+
+  private readonly engineActorNs: CF.DurableObjectNamespace<EngineActorBase>;
+
   constructor(readonly state: CF.DurableObjectState, override readonly env: Bindings) {
     super(state as any, env);
+    this.engineActorNs = this.getEngineActorNamespace(env)
   }
 
   override fetch(req: unknown): Promise<never> {
     throw new Error('Method not implemented.');
   }
 
-  async onEioSocketConnection(actorAddr: CF.DurableObjectId, socketId: string) {
-    debugLogger('SocketActor#onEioSocketConnection', actorAddr, socketId);
+  async onEioSocketConnection(actorAddr_: string, socketId: string) {
+    debugLogger('SocketActor#onEioSocketConnection', actorAddr_, socketId);
     const sioServer = await this.sioServer;
+    const actorAddr = this.engineActorNs.idFromString(actorAddr_);
     const stubConn = new EioSocketStub(socketId, actorAddr, sioServer);
     await sioServer.onEioConnection(stubConn);
   }
 
-  async onEioSocketData(actorAddr: CF.DurableObjectId, socketId: string, data: unknown) {
+  async onEioSocketData(actorAddr: string, socketId: string, data: unknown) {
     debugLogger('SocketActor#onEioSocketData', actorAddr, socketId, data);
     const sioServer = await this.sioServer;
     sioServer.onEioData(socketId, data);
   }
 
-  async onEioSocketClose(actorAddr: CF.DurableObjectId, socketId: string, code: number, reason: string) {
+  async onEioSocketClose(actorAddr: string, socketId: string, code: number, reason: string) {
     debugLogger('SocketActor#onEioSocketClose', actorAddr, socketId, code, reason);
     const sioServer = await this.sioServer;
     sioServer.onEioClose(socketId, code, reason);
   }
 
-  async onEioSocketError(actorAddr: CF.DurableObjectId, socketId: string, error: unknown) {
+  async onEioSocketError(actorAddr: string, socketId: string, error: unknown) {
     debugLogger('SocketActor#onEioSocketError', actorAddr, socketId, error);
     const sioServer = await this.sioServer;
     sioServer.onEioError(socketId, error);

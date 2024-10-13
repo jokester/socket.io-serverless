@@ -42,12 +42,12 @@ export class EioSocket extends Socket {
     const eioAddr = socketState.eioActorId;
 
     // start forwarding data/close/error events to sioActorStub
-    this.on('data', data => socketState.socketActorStub.onEioSocketData(eioAddr, socketState.eioSocketId, data));
+    this.on('data', data => socketState.socketActorStub.onEioSocketData(eioAddr.toString(), socketState.eioSocketId, data));
     this.on(
       'close',
-      (code, reason) => socketState.socketActorStub.onEioSocketClose(eioAddr, socketState.eioSocketId, code, reason),
+      (code, reason) => socketState.socketActorStub.onEioSocketClose(eioAddr.toString(), socketState.eioSocketId, code, reason),
     );
-    this.on('error', error => socketState.socketActorStub.onEioSocketError(eioAddr, socketState.eioSocketId, error));
+    this.on('error', error => socketState.socketActorStub.onEioSocketError(eioAddr.toString(), socketState.eioSocketId, error));
     // TODO: subscribe to close/error inside SioActor code
   }
 
