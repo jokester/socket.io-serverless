@@ -203,7 +203,7 @@ export class SioServer extends OrigSioServer {
      * NOTE the ownerActor received from RPC lacks something
      * and needs to be before used to call RPC
      */
-    const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActor);
+    const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActorId);
     debugLogger('SioServer#writeEioMessage', engineActorStub.id, stub.eioSocketId, msg);
 
     const succeed = await engineActorStub.writeEioMessage(stub.eioSocketId, msg);
@@ -214,7 +214,7 @@ export class SioServer extends OrigSioServer {
   }
 
   async closeEioConn(stub: EioSocketStub) {
-    const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActor);
+    const engineActorStub = deserializeDoStub(this.engineActorNs, stub.ownerActorId);
     debugLogger('SioServer#closeEioConn', engineActorStub.id, stub.eioSocketId);
 
     const succeed = await engineActorStub.closeEioConn(stub.eioSocketId);
@@ -226,7 +226,7 @@ export class SioServer extends OrigSioServer {
 
 export function deserializeDoStub(
   ns: CF.DurableObjectNamespace<EngineActorBase>,
-  actorId: string | CF.DurableObjectId,
+  actorId: string,
 ): CF.DurableObjectStub<EngineActorBase> {
   const destId = ns.idFromString(actorId.toString());
   return ns.get(destId);

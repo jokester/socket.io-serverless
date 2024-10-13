@@ -10,7 +10,7 @@ const debugLogger = debugModule('sio-serverless:sio:EioSocketStub');
 // eio.Socket stub to socket.io code
 // @ts-expect-error
 export class EioSocketStub extends EventEmitter implements eio.Socket {
-  constructor(readonly eioSocketId: string, readonly ownerActor: CF.DurableObjectId, readonly server: SioServer) {
+  constructor(readonly eioSocketId: string, readonly ownerActorId: string, readonly server: SioServer) {
     super();
   }
 
