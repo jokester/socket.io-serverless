@@ -65,7 +65,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
   }
 
   // @ts-expect-error
-  webSocketClose(ws: CF.WebSocket, code: number, reason: string, wasClean: boolean) {
+  override webSocketClose(ws: CF.WebSocket, code: number, reason: string, wasClean: boolean) {
     debugLogger('EngineActor#webSocketClose', code, reason, wasClean);
     const socketState = this.delegate.recallSocketStateForConn(ws);
     const socket = socketState && this.delegate.reviveEioSocket(socketState);
@@ -74,7 +74,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
   }
 
   // @ts-expect-error
-  webSocketError(ws: CF.WebSocket, error: unknown) {
+  override webSocketError(ws: CF.WebSocket, error: unknown) {
     debugLogger('EngineActor#webSocketError', error);
     const socketState = this.delegate.recallSocketStateForConn(ws);
     const socket = socketState && this.delegate.reviveEioSocket(socketState);

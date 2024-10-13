@@ -15,7 +15,7 @@ interface PersistedSioServerStateClients {
 
 export interface PersistedSioClientState {
   clientId: string;
-  engineActorId: CF.DurableObjectId;
+  engineActorId: string;
   namespaces: Map<
     /* concrete nsp.name*/ string,
     {
@@ -120,19 +120,17 @@ export class Persister {
     await this.replaceGlobalState<PersistedSioServerStateClients>(
       KEY_GLOBAL_STATE_CLIENTS,
       (prev) => {
-        if (prev?.clientIds) {
-          prev.clientIds.add(clientId);
-          return prev;
-        } else {
-          return {
-            clientIds: new Set([clientId]),
-          };
-        }
+        const clientIds = new Set(prev?.clientIds ?? []);
+        clientIds.add(clientId);
+        return {
+          clientIds,
+        };
       },
     );
     await this.replaceClientState(clientId, (prev) => ({
       clientId,
-      engineActorId: stub.ownerActor,
+      // must this be persisted as string?
+      engineActorId: stub.ownerActor.toString(),
       namespaces: new Map(),
     }));
   }
@@ -142,8 +140,11 @@ export class Persister {
     await this.replaceGlobalState<PersistedSioServerStateClients>(
       KEY_GLOBAL_STATE_CLIENTS,
       (prev) => {
-        prev?.clientIds.delete(stub.eioSocketId);
-        return prev!;
+        const clientIds = new Set(prev?.clientIds ?? []);
+        clientIds.delete(stub.eioSocketId);
+        return {
+          clientIds,
+        };
       },
     );
     await this.replaceClientState(stub.eioSocketId, whatever => null);
@@ -164,7 +165,7 @@ export class Persister {
         socketPid: socket.pid,
         rooms: [],
       });
-      return prev!;
+      return {...prev!};
     });
   }
 
@@ -176,7 +177,7 @@ export class Persister {
     debugLogger('onSocketDisconnect', clientId, socket.nsp.name);
     await this.replaceClientState(clientId, (prev) => {
       prev!.namespaces.delete(socket.nsp.name);
-      return prev!;
+      return {...prev!};
     });
   }
 

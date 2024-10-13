@@ -11,12 +11,11 @@ import { SingleActorAdapter } from './SingleActorAdapter';
 const debugLogger = debug('sio-serverless:sio:SocketActor');
 
 export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<Bindings> {
-
   private readonly engineActorNs: CF.DurableObjectNamespace<EngineActorBase>;
 
   constructor(readonly state: CF.DurableObjectState, override readonly env: Bindings) {
     super(state as any, env);
-    this.engineActorNs = this.getEngineActorNamespace(env)
+    this.engineActorNs = this.getEngineActorNamespace(env);
   }
 
   override fetch(req: unknown): Promise<never> {

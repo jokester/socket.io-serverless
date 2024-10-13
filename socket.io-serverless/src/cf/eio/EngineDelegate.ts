@@ -78,7 +78,19 @@ export class DefaultEngineDelegate implements EngineDelegate {
     };
     const created = new EioSocket(socketState, transport); // this send the 'open' packet
 
-    await sioActorStub.onEioSocketConnection(socketState.eioActorId.toString(), eioSocketId);
+    const eioActorId = socketState.eioActorId.toString();
+    try {
+      await sioActorStub.onEioSocketConnection(eioActorId, eioSocketId);
+    } catch (e: any) {
+      debugLogger(
+        'error calling sioActorStub.onEioSocketConnection()',
+        e,
+        e?.stack,
+        typeof eioActorId,
+        typeof eioSocketId,
+      );
+      throw e;
+    }
     created.setupOutgoingEvents(socketState);
     this._liveConnections.set(eioSocketId, created);
     debugLogger('created new EioSocket', eioSocketId);

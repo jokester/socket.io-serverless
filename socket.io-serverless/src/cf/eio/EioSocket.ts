@@ -42,13 +42,30 @@ export class EioSocket extends Socket {
     const eioAddr = socketState.eioActorId;
 
     // start forwarding data/close/error events to sioActorStub
-    this.on('data', data => socketState.socketActorStub.onEioSocketData(eioAddr.toString(), socketState.eioSocketId, data));
-    this.on(
-      'close',
-      (code, reason) => socketState.socketActorStub.onEioSocketClose(eioAddr.toString(), socketState.eioSocketId, code, reason),
-    );
-    this.on('error', error => socketState.socketActorStub.onEioSocketError(eioAddr.toString(), socketState.eioSocketId, error));
-    // TODO: subscribe to close/error inside SioActor code
+    this.on('data', async data => {
+      try {
+        await socketState.socketActorStub.onEioSocketData(eioAddr.toString(), socketState.eioSocketId, data);
+        debugLogger('forwarded transport data into socketActorStub');
+      } catch (e: any) {
+        debugLogger('error calling socketActorStub.onEioSocketData()', e, e?.stack);
+      }
+    });
+    this.on('close', async (code, reason) => {
+      try {
+        await socketState.socketActorStub.onEioSocketClose(eioAddr.toString(), socketState.eioSocketId, code, reason);
+        debugLogger('forwarded transport close into socketActorStub');
+      } catch (e: any) {
+        debugLogger('error calling socketActorStub.onEioSocketClose()', e, e?.stack);
+      }
+    });
+    this.on('error', async error => {
+      try {
+        await socketState.socketActorStub.onEioSocketError(eioAddr.toString(), socketState.eioSocketId, error);
+        debugLogger('forwarded transport error into socketActorStub');
+      } catch (e: any) {
+        debugLogger('error calling socketActorStub.onEioSocketError()', e, e?.stack);
+      }
+    });
   }
 
   // @ts-ignore

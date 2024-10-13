@@ -73,6 +73,7 @@ export class SioServer extends OrigSioServer {
     {
       const engineActorStub = deserializeDoStub(this.engineActorNs, clientState.engineActorId);
       if (!await engineActorStub.getConnLiveness(clientId)) {
+        debugLogger('SioServer#reviveClientState() false', clientId);
         return false;
       }
     }
