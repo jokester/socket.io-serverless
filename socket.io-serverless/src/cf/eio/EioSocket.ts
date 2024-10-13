@@ -14,8 +14,8 @@ function createStubEioServer() {
       /**
        * EngineActor gets waken up every 30s by alarm. Client should receive 'ping' at that interval
        */
-      pingInterval: 30_000,
-      pingTimeout: 15_000,
+      pingInterval: 60e3,
+      pingTimeout: 10 * 60e3,
     } as eio.ServerOptions,
     upgrades: () => [],
   });

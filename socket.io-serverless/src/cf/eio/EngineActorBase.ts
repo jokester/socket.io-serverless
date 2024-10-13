@@ -22,7 +22,7 @@ export interface EioSocketState {
   ws?: CF.WebSocket;
 }
 
-const ALARM_INTERVAL = 30e3;
+const ALARM_INTERVAL = 60e3;
 const ENCODED_PING = PACKET_TYPES['ping'];
 
 export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject {
@@ -30,7 +30,9 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
   constructor(readonly state: CF.DurableObjectState, override readonly env: Bindings) {
     super(state as any, env);
     this.delegate = new DefaultEngineDelegate(state, this.getSocketActorNamespace(env));
-    this.state.storage.setAlarm(Date.now() + ALARM_INTERVAL, {allowConcurrency: false});
+    this.state.storage.setAlarm(Date.now() + ALARM_INTERVAL).catch(e => {
+      debugLogger('error setting alarm in constructor', e);
+    });
   }
 
   // @ts-ignore
@@ -52,7 +54,9 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
     if (Date.now() > wokenAt + ALARM_INTERVAL / 2) {
       console.warn('EngineActor#alarm(): Unexpectingly slow sending ping to engine.io clients. Maybe too connections.');
     }
-    await this.state.storage.setAlarm(wokenAt + ALARM_INTERVAL);
+    await this.state.storage.setAlarm(wokenAt + ALARM_INTERVAL).catch(e => {
+      debugLogger('error setting alarm in alarm()', e);
+    });
   }
 
   // @ts-expect-error
