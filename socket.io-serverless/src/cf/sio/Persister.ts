@@ -130,7 +130,7 @@ export class Persister {
     await this.replaceClientState(clientId, (prev) => ({
       clientId,
       // must this be persisted as string?
-      engineActorId: stub.ownerActor.toString(),
+      engineActorId: stub.ownerActorId.toString(),
       namespaces: new Map(),
     }));
   }
