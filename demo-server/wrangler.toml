@@ -4,8 +4,11 @@ name = "sio-serverless-demo"
 main = "src/cf/main.ts"
 compatibility_date = "2024-08-21"
 compatibility_flags = [ "nodejs_compat_v2" ]
+workers_dev = true
 
-workers_dev = false
+[observability]
+enabled = true
+
 [dev]
 port = 18787
 
