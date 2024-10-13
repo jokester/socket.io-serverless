@@ -16,7 +16,6 @@ bindings = [
 ]
 
 [vars]
-DEBUG = "*"
 
 [[migrations]]
 tag = "v1" # Should be unique for each entry
