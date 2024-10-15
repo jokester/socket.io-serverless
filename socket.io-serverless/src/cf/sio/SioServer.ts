@@ -81,7 +81,7 @@ export class SioServer extends OrigSioServer {
      * this fits `cleanupEmptyChildNamespaces` in effect
      */
     const recoveredNsps = new DefaultMap<string, null | Namespace>((nsName) => {
-      if (s.concreteNamespaces.includes(nsName)) {
+      if (nsName === '/' || s.concreteNamespaces.includes(nsName)) {
         debugLogger('recreating namespace', nsName);
         return this.of(nsName);
       } else {
