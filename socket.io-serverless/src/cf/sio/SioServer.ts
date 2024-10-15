@@ -135,8 +135,8 @@ export class SioServer extends OrigSioServer {
       // replay Namespace#_add() , to not call Namespace#_doConnect()
       const socket = new Socket(nsp, client as any, {}, {
         sid: nspState.socketId,
-        pid: nspState.socketPid,
-        rooms: nspState.rooms,
+        pid: undefined!,
+        rooms: [],
         missedPackets: [],
         data: null,
       });

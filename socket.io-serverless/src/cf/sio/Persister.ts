@@ -20,9 +20,10 @@ export interface PersistedSioClientState {
     /* concrete nsp.name*/ string,
     {
       socketId: string;
-      socketPid: string;
+      // NOTE socketPid is not implemented as a part of session recovery
+      // socketPid: string;
       // TODO maybe persist rooms too (would require hooking in Adapter)
-      rooms: string[];
+      // rooms: string[];
     }
   >;
 }
@@ -168,9 +169,8 @@ export class Persister {
       // HOPEFULLY this will not be in parallel onNewClient
       prev!.namespaces.set(socket.nsp.name, {
         socketId: socket.id,
-        // @ts-expect-error use of private
-        socketPid: socket.pid,
-        rooms: [],
+        // socketPid: socket.pid,
+        // rooms: [],
       });
       return {...prev!};
     });
