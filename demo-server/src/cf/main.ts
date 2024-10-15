@@ -6,13 +6,17 @@ import type { Server } from 'socket.io/lib'
 
 const debugLogger = createDebugLogger('socket.io-serverless:demo:cf-main');
 
+/**
+ * enable debug loggers in engine.io / socket.io / socket.io-serverless
+ */
 setEnabledLoggerNamespace([
-    'engine:',
-    'socket.io:',
-    'sio-serverless',
-    'sio-serverless:eio:EngineActor',
+    // 'engine:',
+    // 'socket.io:',
+    // 'socket.io:socket',
+    // 'sio-serverless',
+    // 'sio-serverless:eio:EngineActor',
     'sio-serverless:sio:SioServer',
-    // 'sio-serverless:sio:Persister',
+    'sio-serverless:sio:Persister',
 ]);
 
 export const EngineActor = createEioActor<WorkerBindings>({
