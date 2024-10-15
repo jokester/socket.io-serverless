@@ -9,6 +9,36 @@ import { PersistedSioClientState, Persister } from './Persister';
 
 const debugLogger = debugModule('sio-serverless:sio:SioServer');
 
+const unsupportedOptionKeys: readonly (keyof sio.ServerOptions)[] = [
+  // socket.io
+  'path',
+  'serveClient',
+  'parser',
+  'connectTimeout',
+  'connectionStateRecovery',
+  'cleanupEmptyChildNamespaces',
+  // engine.io AttachOptions
+  'path',
+  'destroyUpgrade',
+  'destroyUpgradeTimeout',
+  'addTrailingSlash',
+  // engine.io ServerOptions
+  'pingTimeout',
+  'pingInterval',
+  'upgradeTimeout',
+  'maxHttpBufferSize',
+  'allowRequest',
+  'transports',
+  'allowUpgrades',
+  'perMessageDeflate',
+  'httpCompression',
+  'wsEngine',
+  'initialPacket',
+  'cookie',
+  'cors',
+  'allowEIO3',
+];
+
 export class SioServer extends OrigSioServer {
   private readonly connStubs = new Map<string, EioSocketStub>();
 
@@ -19,8 +49,9 @@ export class SioServer extends OrigSioServer {
     readonly persister: Persister,
   ) {
     debugLogger('CustomSioServer#constructor');
-    if (options.connectionStateRecovery) {
-      throw new Error('options.connectionStateRecovery is not supported');
+    const overlapedOptions = unsupportedOptionKeys.filter(key => options[key] !== undefined);
+    if (overlapedOptions.length) {
+      throw new Error(`Unsupported socket.io ServerOptions: ${overlapedOptions.join(' , ')}`);
     }
 
     super(undefined, {
@@ -148,7 +179,9 @@ export class SioServer extends OrigSioServer {
       });
     });
 
-    // NOTE SioClient creation will only be triggered later
+    // NOTE removal
+
+    // NOTE new SioClient creation will only be triggered later
   }
 
   override of(

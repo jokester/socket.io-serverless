@@ -12,13 +12,11 @@ export const createEioActor: typeof exports.createEioActor = function<
   Bindings,
 >(options: exports.EioActorOptions<Bindings>) {
   return class EioActor extends EngineActorBase<Bindings> {
-
     override getSocketActorNamespace(
       bindings: Bindings,
     ): DurableObjectNamespace<SocketActorBase> {
       return options.getSocketActorNamespace(bindings);
     }
-
   };
 };
 
@@ -26,7 +24,6 @@ export const createSioActor: typeof exports.createSioActor = function<
   Bindings,
 >(options: exports.SioActorOptions<Bindings>) {
   return class SioActor extends SocketActorBase<Bindings> {
-
     override async onServerCreated(s: SioServer): Promise<void> {
       await super.onServerCreated(s);
       await options.onServerCreated?.(s);
