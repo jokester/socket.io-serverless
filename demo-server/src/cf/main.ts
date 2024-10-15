@@ -1,8 +1,7 @@
 import * as forwardEverything from "../app/forward-everything";
-import { createEioActor, createSioActor, createDebugLogger, setEnabledLoggerNamespace, generateBase64id } from "socket.io-serverless/dist/cf.js";
-import { Hono } from 'hono';
+import { createEioActor, createSioActor, createDebugLogger, setEnabledLoggerNamespace, generateBase64id } from "socket.io-serverless-npm/dist/cf.js";
 import type { DurableObjectNamespace } from '@cloudflare/workers-types';
-import type { Namespace, Server } from 'socket.io/lib'
+import type { Server } from 'socket.io'
 
 const debugLogger = createDebugLogger('socket.io-serverless:demo:cf-main');
 
@@ -32,14 +31,14 @@ export const SocketActor = createSioActor({
      * used to set parent namespace etc
      */
     async onServerCreated(s: Server) {
-    debugLogger('SioServer created')
-    // add parent namespace with regex
-    s.of(forwardEverything.parentNamespace)
-        .on('connection', (socket) => {
-            // forward
-            debugLogger('sio.Socket created', socket.nsp.name, socket.id)
-            forwardEverything.onConnection(socket);
-        });
+        debugLogger('SioServer created')
+        // add parent namespace with regex
+        s.of(forwardEverything.parentNamespace)
+            .on('connection', (socket) => {
+                // forward
+                debugLogger('sio.Socket created', socket.nsp.name, socket.id)
+                forwardEverything.onConnection(socket);
+            });
 
 
     },
@@ -60,19 +59,26 @@ export const SocketActor = createSioActor({
 });
 
 export interface WorkerBindings extends Record<string, unknown> {
-    // @ts-ignore
-    engineActor: DurableObjectNamespace<EioActor>
-    // @ts-ignore
+    // @ts-expect-error
+    engineActor: DurableObjectNamespace<EngineActor>
+    // @ts-expect-error
     socketActor: DurableObjectNamespace<SocketActor>
 }
 
-export const workerApp = new Hono<{ Bindings: WorkerBindings }>().get(
-    '/socket.io/*',
-    async ctx => {
-        // debugLogger('ws connection request', ctx.req.url);
+export default {
+    async fetch(req: Request, env: WorkerBindings) {
+        const parsedUrl = new URL(req.url);
 
-        const actorId = ctx.env.engineActor.idFromName("singleton");
-        const engineActorStub = ctx.env.engineActor.get(actorId);
+        if (!parsedUrl.pathname.startsWith('/socket.io/')) {
+            return new Response(null, { status: 404 })
+        }
+
+        if (req.headers.get('upgrade') !== 'websocket') {
+            return new Response('websocket only', { status: 400 })
+        }
+
+        const actorId = env.engineActor.idFromName("singleton");
+        const engineActorStub = env.engineActor.get(actorId);
 
         /**
          * generate session id, it will be used as
@@ -80,11 +86,8 @@ export const workerApp = new Hono<{ Bindings: WorkerBindings }>().get(
          * 2. socket.io Client#id
          */
         const sessionId = generateBase64id()
-        // @ts-ignore
-        const res = await engineActorStub.fetch(`https://eioServer.internal/socket.io/?eio_sid=${sessionId}`, ctx.req.raw);
-        // @ts-ignore
-        return new Response(res.body, res);
-    }
-);
+        return engineActorStub.fetch(`https://eioServer.internal/socket.io/?eio_sid=${sessionId}`, req);
 
-export default workerApp;
+        // return new Response(res.body, res);
+    }
+}

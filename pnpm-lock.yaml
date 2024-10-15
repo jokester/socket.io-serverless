@@ -127,9 +127,6 @@ importers:
       engine.io:
         specifier: workspace:*
         version: link:../socket.io/packages/engine.io
-      hono:
-        specifier: ^4.6.3
-        version: 4.6.3
       socket.io:
         specifier: workspace:*
         version: link:../socket.io/packages/socket.io
@@ -2054,10 +2051,6 @@ packages:
 
   header-case@2.0.4:
     resolution: {integrity: sha512-H/vuk5TEEVZwrR0lp2zed9OCo1uAILMlx0JEMgC26rzyJJ3N1v6XkwHHXJQdR2doSjcGPM6OKPYoJgf0plJ11Q==}
-
-  hono@4.6.3:
-    resolution: {integrity: sha512-0LeEuBNFeSHGqZ9sNVVgZjB1V5fmhkBSB0hZrpqStSMLOWgfLy0dHOvrjbJh0H2khsjet6rbHfWTHY0kpYThKQ==}
-    engines: {node: '>=16.9.0'}
 
   hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
@@ -4792,8 +4785,6 @@ snapshots:
     dependencies:
       capital-case: 1.0.4
       tslib: 2.7.0
-
-  hono@4.6.3: {}
 
   hosted-git-info@2.8.9: {}
 

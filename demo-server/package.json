@@ -19,7 +19,6 @@
     "@jokester/ts-commonutil": "^0.6.0",
     "debug": "^4.3.7",
     "engine.io": "workspace:*",
-    "hono": "^4.6.3",
     "socket.io": "workspace:*",
     "socket.io-serverless": "workspace:^",
     "socket.io-serverless-npm": "npm:socket.io-serverless@0.1.0-beta3"
