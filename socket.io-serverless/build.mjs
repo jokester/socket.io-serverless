@@ -171,7 +171,8 @@ const cfBuildContext = {
   format: 'esm',
   metafile: true,
   outfile: 'dist/cf.js',
-  // sourcemap: true,
+  sourcemap: true,
+  legalComments: 'linked',
   external: [
     'cloudflare:workers',
     'events',
