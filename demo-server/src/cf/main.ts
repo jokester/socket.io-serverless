@@ -2,12 +2,12 @@ import * as forwardEverything from "../app/forward-everything";
 import { createEioActor, createSioActor, createDebugLogger, setEnabledLoggerNamespace, generateBase64id } from "socket.io-serverless/dist/cf.js";
 import { Hono } from 'hono';
 import type { DurableObjectNamespace } from '@cloudflare/workers-types';
-import type { Server } from 'socket.io/lib'
+import type { Namespace, Server } from 'socket.io/lib'
 
 const debugLogger = createDebugLogger('socket.io-serverless:demo:cf-main');
 
 /**
- * enable debug loggers in engine.io / socket.io / socket.io-serverless
+ * enable debug loggers in engine.io / socket.io / socket.io-serverless 
  */
 setEnabledLoggerNamespace([
     // 'engine:',
@@ -15,8 +15,9 @@ setEnabledLoggerNamespace([
     // 'socket.io:socket',
     // 'sio-serverless',
     // 'sio-serverless:eio:EngineActor',
-    'sio-serverless:sio:SioServer',
-    'sio-serverless:sio:Persister',
+    // 'sio-serverless:sio:SioServer',
+    // 'sio-serverless:sio:Persister',
+    'socket.io-serverless:demo',
 ]);
 
 export const EngineActor = createEioActor<WorkerBindings>({
@@ -25,19 +26,34 @@ export const EngineActor = createEioActor<WorkerBindings>({
     }
 });
 
-async function onServerCreated(s: Server) {
+export const SocketActor = createSioActor({
+    /**
+     * callback when socket.io Server created
+     * used to set parent namespace etc
+     */
+    async onServerCreated(s: Server) {
     debugLogger('SioServer created')
-    // XXX how to support such use with re-created nsps / sockets?
+    // add parent namespace with regex
     s.of(forwardEverything.parentNamespace)
         .on('connection', (socket) => {
+            // forward
             debugLogger('sio.Socket created', socket.nsp.name, socket.id)
             forwardEverything.onConnection(socket);
         });
 
-}
 
-export const SocketActor = createSioActor({
-    onServerCreated,
+    },
+    /**
+     * callback when namespaces / clients / sockets restored
+     */
+    async onServerStateRestored(server) {
+        for (const [name, namespace] of server._nsps) {
+            debugLogger('onServerStateRestored', 'namespaces', name);
+            for (const [sioSocketId, sioSocket] of namespace.sockets) {
+                debugLogger('active client', sioSocketId, sioSocket.client.id);
+            }
+        }
+    },
     getEngineActorNamespace(bindings: WorkerBindings) {
         return bindings.engineActor
     }

@@ -3,10 +3,10 @@ import type * as sio from 'socket.io/lib';
 
 export const parentNamespace = /^\/v1\/[-\w:.]+$/;
 
-const logger = createDebugLogger('limb:server:demo-app');
+const logger = createDebugLogger('socket.io-serverless:demo:app');
 
 /**
- * An example socket.io app , forwarding all messages to all clients.
+ * An example socket.io server logic, forwarding all messages to all clients.
  * @param socket
  */
 export function onConnection(socket: sio.Socket) {
@@ -25,7 +25,7 @@ export function onConnection(socket: sio.Socket) {
     logger('error', namespace.name, socket.id, error);
   });
 
-  // only forward "message" events. Clients should use `send(clientEventName, value)`
+  // forward "message" events to the same namespace. Clients should use `send(clientEventName, value)`
   socket.on('message', (event: string, value: any) => {
     logger('forwarding message', namespace.name, socket.id, event, value);
     namespace.send(event, value);
