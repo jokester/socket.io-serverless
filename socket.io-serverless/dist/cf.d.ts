@@ -14,7 +14,8 @@ interface EioActorOptions<Bindings> {
 
 interface SioActorOptions<Bindings> {
     getEngineActorNamespace(bindings: Bindings): CF.DurableObjectNamespace<SocketActorBase>;
-    onServerCreated?(server: sio.Server): void | Promise<void>
+    onServerCreated?(server: sio.Server): void | Promise<void>;
+    onServerStateRestored?(server: sio.Server): void | Promise<void>;
 }
 
 interface DebugLogger {
