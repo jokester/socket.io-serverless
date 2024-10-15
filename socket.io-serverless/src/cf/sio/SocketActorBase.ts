@@ -63,7 +63,8 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
   private readonly sioServer = lazyThenable(async () => {
     const s = await createSioServer(this.state, this.getEngineActorNamespace(this.env));
     await this.onServerCreated(s);
-    await s.restoreState();
+    const restored = await s.restoreState();
+    await s.persister.persistRestoredClients(restored.persistedClientIds, restored.clientIds);
     await this.onServerStateRestored(s);
     s.startPersisting();
     return s;

@@ -39,6 +39,11 @@ const unsupportedOptionKeys: readonly (keyof sio.ServerOptions)[] = [
   'allowEIO3',
 ];
 
+interface RestoreServerStateReport {
+  persistedClientIds: Set<string>;
+  clientIds: Set<string>;
+}
+
 export class SioServer extends OrigSioServer {
   private readonly connStubs = new Map<string, EioSocketStub>();
 
@@ -65,7 +70,7 @@ export class SioServer extends OrigSioServer {
     });
   }
 
-  async restoreState() {
+  async restoreState(): Promise<RestoreServerStateReport> {
     const s = await this.persister.loadServerState();
     debugLogger('restore server state', s);
     const recoveredNsps = new Map<string, Namespace>();
@@ -93,7 +98,11 @@ export class SioServer extends OrigSioServer {
         revivedClientIds.add(clientId);
       }
     }
-    await this.persister.persistRestoredClients(s.clientIds, revivedClientIds);
+    return {
+      persistedClientIds: s.clientIds,
+      clientIds: revivedClientIds,
+      // concreteNamespaces: revov
+    };
   }
 
   private async reviveClientState(
