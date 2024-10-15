@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react';
 import {io, Socket} from 'socket.io-client';
 import {useSingleton} from 'foxact/use-singleton';
 import {UserBoard} from '../../../apps/v1/user-board';
-import {PageProps} from '../../_shared';
+import {getSocketServerOrigin, PageProps} from '../../_shared';
 import {useRandomId} from '../../../hooks/use-random-id';
 
 const logger = debug('app:v1:demoPage');
@@ -30,12 +30,7 @@ function usePageState(namespace: string): PageState {
   }
 
   useEffect(() => {
-    let sioOrigin
-    if (location.href.includes('remote=1')) {
-      sioOrigin = 'https://limb.jokester.io'
-    } else {
-      sioOrigin = 'http://localhost:18787'
-    }
+    const sioOrigin = getSocketServerOrigin(location);
     const socket = io(`${sioOrigin}/v1/${namespace}`, {
       transports: ['websocket'],
     });
@@ -99,7 +94,7 @@ function usePageState(namespace: string): PageState {
       }
     },
         // 2e3, //
-        15e3, // causes SioActor to hibernate
+        30e3, // causes SioActor to hibernate
         );
 
     return () => {

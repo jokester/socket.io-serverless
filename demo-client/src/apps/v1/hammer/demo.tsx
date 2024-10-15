@@ -22,7 +22,7 @@ function _HammerTouchDemo({
   const replayElements = useInputReplayElements(ownClientId);
 
   useEffect(() => {
-    const defaultOrigin = getSocketServerOrigin();
+    const defaultOrigin = getSocketServerOrigin(location);
 
     const socket = io(`${defaultOrigin}/v1/${namespace}`, {
       transports: ['websocket'],
