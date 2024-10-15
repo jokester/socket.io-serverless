@@ -98,6 +98,12 @@ export class Persister {
     );
   }
 
+  async persistRestoredNamespaces(concreteNamespaces: string[]) {
+    await this.replaceGlobalState<PersistedSioServerStateNamespaces>(
+      KEY_GLOBAL_STATE_NAMESPACES,
+      prev => ({concreteNamespaces}),
+    );
+  }
   /**
    * remove dead client ids in storage
    */
@@ -109,6 +115,7 @@ export class Persister {
     for (const i of savedClientIds) {
       if (!aliveClientIds.has(i)) {
         debugLogger('persistRestoredClients removing', i);
+        // TODO: maybe this can be run concurrently
         await this.replaceClientState(i, () => null);
       }
     }

@@ -6,6 +6,7 @@ import { SioClient } from './SioClient';
 import { EngineActorBase } from '../eio/EngineActorBase';
 import type * as sio from 'socket.io/lib';
 import { PersistedSioClientState, Persister } from './Persister';
+import { DefaultMap } from '@jokester/ts-commonutil/lib/collection/default-map';
 
 const debugLogger = debugModule('sio-serverless:sio:SioServer');
 
@@ -42,6 +43,8 @@ const unsupportedOptionKeys: readonly (keyof sio.ServerOptions)[] = [
 interface RestoreServerStateReport {
   persistedClientIds: Set<string>;
   clientIds: Set<string>;
+  persistedConcreteNamespaces: string[];
+  concreteNamespaces: string[];
 }
 
 export class SioServer extends OrigSioServer {
@@ -65,27 +68,26 @@ export class SioServer extends OrigSioServer {
       transports: ['websocket'],
       allowEIO3: false,
       serveClient: false,
-      // connectionStateRecovery: undefined,
+      connectionStateRecovery: undefined!,
       cleanupEmptyChildNamespaces: true,
     });
   }
 
   async restoreState(): Promise<RestoreServerStateReport> {
     const s = await this.persister.loadServerState();
-    debugLogger('restore server state', s);
-    const recoveredNsps = new Map<string, Namespace>();
-    // TODO think about if we should recover all concrete namespaces
-    // - a concrete namespace may or may not have a parent ns
-    // - user may or may not want to recover empty NS
-    for (const nsName of s.concreteNamespaces) {
-      if (nsName == '/') {
-        // root ns is created by default
-        continue;
+    debugLogger('restoreState()', s);
+    /**
+     * A DefaultMap to restore concrete namespaces only if an alive client exists
+     * this fits `cleanupEmptyChildNamespaces` in effect
+     */
+    const recoveredNsps = new DefaultMap<string, null | Namespace>((nsName) => {
+      if (s.concreteNamespaces.includes(nsName)) {
+        debugLogger('recreating namespace', nsName);
+        return this.of(nsName);
+      } else {
+        return null;
       }
-      // this will rebuild the namespaces, and (when name matches) add them to parentNsp.children
-      debugLogger('recreating namespace', nsName);
-      recoveredNsps.set(nsName, this.of(nsName));
-    }
+    });
 
     // FIXME should this be batched?
     const clientStates = await this.persister.loadClientStates(s.clientIds);
@@ -101,14 +103,15 @@ export class SioServer extends OrigSioServer {
     return {
       persistedClientIds: s.clientIds,
       clientIds: revivedClientIds,
-      // concreteNamespaces: revov
+      persistedConcreteNamespaces: s.concreteNamespaces,
+      concreteNamespaces: [...recoveredNsps.keys()],
     };
   }
 
   private async reviveClientState(
     clientId: string,
     clientState: PersistedSioClientState,
-    recoveredNsps: ReadonlyMap<string, Namespace>,
+    recoveredNsps: DefaultMap<string, Namespace | null>,
   ): Promise<boolean> {
     {
       const engineActorStub = deserializeDoStub(this.engineActorNs, clientState.engineActorId);
@@ -122,7 +125,7 @@ export class SioServer extends OrigSioServer {
     const client = new SioClient(this, conn);
     clientState.namespaces.forEach((nspState, nspName) => {
       debugLogger('recreate sio.Socket', clientId, nspState);
-      const nsp = recoveredNsps.get(nspName);
+      const nsp = recoveredNsps.getOrCreate(nspName);
 
       if (!nsp) {
         debugLogger('WARNING nsp was referenced but not recreated', clientId, nspName);
@@ -171,26 +174,29 @@ export class SioServer extends OrigSioServer {
     return true;
   }
 
-  startPersisting() {
+  startPersistingStateChange() {
+    const onSocketConnect = (socket: Socket) => {
+      this.persister.onSocketConnect(socket);
+      socket.on('disconnect', (reason, desc) => {
+        this.persister.onSocketDisconnect(socket);
+      });
+    };
+
+    /**
+     * for namespaces already restored
+     */
     for (const nsp of this._nsps.values()) {
-      nsp.on('connection', (socket: Socket) => this.persister.onSocketConnect(socket));
+      nsp.on('connection', onSocketConnect);
     }
     /**
-     * state changes from now on get persisted
+     * for namespaces created later
      */
     this.on('new_namespace', nsp => {
       this.persister.onNewNamespace(nsp.name);
-      nsp.on('connection', (socket: Socket) => {
-        this.persister.onSocketConnect(socket);
-        socket.on('disconnect', (reason, desc) => {
-          this.persister.onSocketDisconnect(socket);
-        });
-      });
+      nsp.on('connection', onSocketConnect);
     });
 
-    // NOTE removal
-
-    // NOTE new SioClient creation will only be triggered later
+    // NOTE removal of namespaces are handled in Adapter
   }
 
   override of(

@@ -65,8 +65,12 @@ export abstract class SocketActorBase<Bindings = unknown> extends DurableObject<
     await this.onServerCreated(s);
     const restored = await s.restoreState();
     await s.persister.persistRestoredClients(restored.persistedClientIds, restored.clientIds);
+    await s.persister.persistRestoredNamespaces(restored.concreteNamespaces);
     await this.onServerStateRestored(s);
-    s.startPersisting();
+    s.startPersistingStateChange();
+    /**
+     * NOTE from now on the server is ready to accept new events
+     */
     return s;
   });
 }
