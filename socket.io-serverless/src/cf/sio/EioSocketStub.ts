@@ -14,6 +14,13 @@ export class EioSocketStub extends EventEmitter implements eio.Socket {
     super();
   }
 
+  /**
+   * becomes socket.io Client.id
+   */
+  get id(): string {
+    return this.eioSocketId;
+  }
+
   get request(): http.IncomingMessage {
     /**
      * queried by
