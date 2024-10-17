@@ -1,0 +1,8 @@
+# deploy build as worker assets
+
+name = "sio-serverless-demo-client-assets"
+assets = { directory = "./static", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
+compatibility_date = "2024-09-25"
+
+[dev]
+port = 18789

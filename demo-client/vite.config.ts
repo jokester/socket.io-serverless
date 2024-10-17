@@ -6,7 +6,7 @@ import path from 'node:path';
 export default defineConfig({
   // root: 'src',
   build: {
-    outDir: path.join(__dirname, '../build/public'),
+    outDir: path.join(__dirname, 'static'),
     emptyOutDir: true,
   },
   resolve: {

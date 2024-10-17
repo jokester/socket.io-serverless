@@ -1,5 +1,5 @@
 {
-  "name": "socket.io-serverless-demo",
+  "name": "socket.io-serverless-demo-client",
   "private": true,
   "version": "0.0.1",
   "description": "a purpose-free signaling server",
@@ -11,7 +11,8 @@
     "clean": "gts clean",
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev",
     "compile": "tsc",
     "fix": "gts fix"
   },
@@ -50,6 +51,6 @@
     "tailwindcss": "^3.4.1",
     "typescript": "*",
     "vite": "^5.0.12",
-    "wrangler": "*"
+    "wrangler": "^3.80"
   }
 }

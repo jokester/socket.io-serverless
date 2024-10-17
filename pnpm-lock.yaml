@@ -113,7 +113,7 @@ importers:
         specifier: ^5.0.12
         version: 5.4.8(@types/node@20.16.10)(sass@1.79.4)
       wrangler:
-        specifier: '*'
+        specifier: ^3.80
         version: 3.80.0(@cloudflare/workers-types@4.20241004.0)
 
   demo-server:
