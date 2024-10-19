@@ -4,5 +4,9 @@ name = "sio-serverless-demo-client-assets"
 assets = { directory = "./static", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
 compatibility_date = "2024-09-25"
 
+routes = [
+ # { pattern = 'sio-serverless-demo-client.ihate.work', custom_domain = true }
+]
+
 [dev]
 port = 18789

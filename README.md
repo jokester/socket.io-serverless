@@ -2,6 +2,8 @@
 
 A custom [socket.io](https://socket.io/) build for serverless environments. Currently [Cloudflare Worker + Durable Objects](https://developers.cloudflare.com/durable-objects/).
 
+Demo client app: [sio-serverless-demo-client](https://sio-serverless-demo-client.ihate.work) running `demo-client/` `demo-server/` code in this repo.
+
 ## Getting started
 
 The following example assumes you already know the Cloudflare products and `wrangler` CLI.
