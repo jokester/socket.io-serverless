@@ -1,0 +1,23 @@
+on:
+  push:
+    tags:
+      - "v**"
+    branches:
+      - main
+  workflow_dispatch:
+  pull_request: {} # NOTE: worktree would be a temporal merge commit
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - run: make patch-upstream lib-build
+      - uses: JS-DevTools/npm-publish@v3
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          dry-run: ${{ github.event_name != 'push' }}
+	  package: ./socket.io-serverless

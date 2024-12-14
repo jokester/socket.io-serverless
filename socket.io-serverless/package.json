@@ -1,7 +1,7 @@
 {
   "name": "socket.io-serverless",
   "description": "A custom socket.io build to run in Cloudflare workers.",
-  "version": "0.2.0",
+  "version": "0.2.0-rc1",
   "type": "module",
   "dependencies": {},
   "files": [
