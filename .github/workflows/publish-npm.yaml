@@ -15,6 +15,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "20"
+      - run: git submodule init && git submodule update
       - run: make patch-upstream lib-build
       - uses: JS-DevTools/npm-publish@v3
         with:
