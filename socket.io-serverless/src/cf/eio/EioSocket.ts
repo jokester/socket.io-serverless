@@ -28,7 +28,7 @@ function createStubEioServer() {
  * - error
  * - close
  */
-// @ts-expect-error
+// @ts-expect-error overriding private methods
 export class EioSocket extends Socket {
   constructor(private readonly socketState: EioSocketState, private readonly _transport: WebSocketTransport) {
     super(socketState.eioSocketId, createStubEioServer() as any, _transport, null!, 4);
@@ -68,8 +68,7 @@ export class EioSocket extends Socket {
     });
   }
 
-  // @ts-ignore
-  private schedulePing() {
+  override schedulePing() {
     // rewrite to workaround incompatible 'timer' polyfill in CF worker
     // (this also removes server-initiated ping timeout detection in protocol v4)
     // @ts-expect-error
@@ -116,5 +115,8 @@ export class RevivedEioSocket extends EioSocket {
     // when this is revived, monkey patch the method
     // to not send 'open' package and initial server message
     this.readyState = 'open';
+
+    // but still set this.pingIntervalTimer to be a stub
+    this.schedulePing();
   }
 }
