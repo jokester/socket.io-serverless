@@ -1,22 +1,29 @@
 import * as forwardEverything from "../app/forward-everything";
-import { createEioActor, createSioActor, createDebugLogger, setEnabledLoggerNamespace, generateBase64id } from "socket.io-serverless-npm/dist/cf.js";
-import type { DurableObjectNamespace } from '@cloudflare/workers-types';
-import type { Server } from 'socket.io'
+import {
+    createEioActor,
+    createSioActor,
+    createDebugLogger,
+    setEnabledLoggerNamespace,
+    generateBase64id
+} from "socket.io-serverless/dist/cf";
+import type {DurableObjectNamespace} from '@cloudflare/workers-types';
+import type {Server} from 'socket.io'
 
 const debugLogger = createDebugLogger('socket.io-serverless:demo:cf-main');
 
 /**
- * enable debug loggers in engine.io / socket.io / socket.io-serverless 
+ * enable debug loggers in engine.io / socket.io / socket.io-serverless
  */
 setEnabledLoggerNamespace([
     // 'engine:',
     // 'socket.io:',
     // 'socket.io:socket',
     // 'sio-serverless',
-    // 'sio-serverless:eio:EngineActor',
+    // 'sio-serverless:eio:EngineActorBase',
+    // 'sio-serverless:eio:AlarmTimer',
     // 'sio-serverless:sio:SioServer',
     // 'sio-serverless:sio:Persister',
-    'socket.io-serverless:demo',
+    'sio-serverless:',
 ]);
 
 export const EngineActor = createEioActor<WorkerBindings>({
@@ -70,11 +77,11 @@ export default {
         const parsedUrl = new URL(req.url);
 
         if (!parsedUrl.pathname.startsWith('/socket.io/')) {
-            return new Response(null, { status: 404 })
+            return new Response(null, {status: 404})
         }
 
         if (req.headers.get('upgrade') !== 'websocket') {
-            return new Response('websocket only', { status: 400 })
+            return new Response('websocket only', {status: 400})
         }
 
         const actorId = env.engineActor.idFromName("singleton");
