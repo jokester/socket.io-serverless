@@ -3,8 +3,6 @@ import type * as CF from '@cloudflare/workers-types';
 import { DurableObject } from 'cloudflare:workers';
 import { DefaultEngineDelegate, EngineDelegate } from './EngineDelegate';
 import { SocketActorBase } from '../sio/SocketActorBase';
-// import { encodePacket, Packet, PacketType } from "engine.io-parser/lib";
-import { PACKET_TYPES } from 'engine.io-parser/lib/commons';
 import { wait } from '@jokester/ts-commonutil/lib/concurrency/timing';
 import { AlarmTimer } from './AlarmTimer';
 
@@ -23,17 +21,16 @@ export interface EioSocketState {
   ws?: CF.WebSocket;
 }
 
-const ALARM_INTERVAL = 60e3;
-const ENCODED_PING = PACKET_TYPES['ping'];
+const PING_INTERVAL = 30e3;
 
 export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<Bindings> implements CF.DurableObject {
   private readonly delegate: EngineDelegate;
   private readonly alarmTimer: AlarmTimer;
+
   constructor(readonly state: CF.DurableObjectState, override readonly env: Bindings) {
     super(state as any, env);
     this.delegate = new DefaultEngineDelegate(state, this.getSocketActorNamespace(env));
-    this.alarmTimer = new AlarmTimer(state, ALARM_INTERVAL);
-    this.alarmTimer.ensureAlarmScheduled().catch(() => {});
+    this.alarmTimer = new AlarmTimer(state, PING_INTERVAL);
   }
 
   // @ts-ignore
@@ -42,20 +39,8 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
   override async alarm(): Promise<void> {
     const wokenAt = Date.now();
     debugLogger('EngineActor#alarm()', wokenAt);
-    // const encoded = await new Promise<string>(f => encodePacket({ type: 'ping' }, false, f))
-    for (const w of this.state.getWebSockets()) {
-      try {
-        w.send(ENCODED_PING);
-        // NOT setting auto reponse pair:
-        // assuming client will send pong before current DO enters hibernation again.
-      } catch (e) {
-        console.error('EngineActor#alarm() error send engine.io PING', e);
-      }
-    }
-    if (Date.now() > wokenAt + ALARM_INTERVAL / 2) {
-      console.warn('EngineActor#alarm(): Unexpectingly slow sending ping to engine.io clients. Maybe too connections.');
-    }
-    await this.ctx.storage.setAlarm(wokenAt + ALARM_INTERVAL);
+    const websockets = this.state.getWebSockets();
+    await this.alarmTimer.onAlarm(wokenAt, websockets);
   }
 
   // @ts-expect-error
@@ -145,6 +130,7 @@ export abstract class EngineActorBase<Bindings = unknown> extends DurableObject<
     const tags = [`sid:${sid}`];
     this.state.acceptWebSocket(serverSocket, tags);
     debugLogger('accepted ws connection', sid, tags);
+    await this.alarmTimer.onNewConnection();
     wait(0.1e3).then(() => this.delegate.createEioSocket(sid, serverSocket)).catch(e => {
       // without this delay, the send of engine.io 'open' packet may fail silently
       console.error('EngineActorBase#fetch() error creating EioSocket', e, e?.stack);

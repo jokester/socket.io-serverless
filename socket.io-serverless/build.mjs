@@ -167,7 +167,7 @@ const cfBuildContext = {
   entryPoints: ['src/cf/index.ts'],
   bundle: true,
   platform: 'neutral',
-  // target: "esnext",
+  target: "es2023",
   format: 'esm',
   metafile: true,
   outfile: 'dist/cf.js',

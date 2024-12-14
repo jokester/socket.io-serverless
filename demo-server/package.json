@@ -20,8 +20,7 @@
     "debug": "^4.3.7",
     "engine.io": "workspace:*",
     "socket.io": "workspace:*",
-    "socket.io-serverless": "workspace:^",
-    "socket.io-serverless-npm": "npm:socket.io-serverless@0.1.0-beta4"
+    "socket.io-serverless": "workspace:^"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241004.0",
