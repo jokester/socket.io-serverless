@@ -2,6 +2,9 @@ import type * as CF from '@cloudflare/workers-types';
 import { lazyThenable } from '@jokester/ts-commonutil/lib/concurrency/lazy-thenable';
 import { ResourcePool } from '@jokester/ts-commonutil/lib/concurrency/resource-pool';
 import { PACKET_TYPES } from 'engine.io-parser/lib/commons';
+import debugModule from 'debug';
+
+const debugLogger = debugModule('sio-serverless:eio:AlarmTimer');
 
 interface AlarmState {
   nextAlarm?: number | null;
@@ -18,24 +21,29 @@ export class AlarmTimer {
   /**
    * a concurrent access proofing, lazy inited state
    */
-  private _state = ResourcePool.single(lazyThenable(async () => ({
-    nextAlarm: await this.actorCtx.storage.getAlarm(),
-  } as AlarmState)));
+  private _state = ResourcePool.single(lazyThenable(async () => {
+    debugLogger('AlarmTimer#_state init');
+    return ({
+      nextAlarm: await this.actorCtx.storage.getAlarm(),
+    } as AlarmState);
+  }));
 
   constructor(private readonly actorCtx: CF.DurableObjectState, readonly pingInterval: number) {
   }
 
   onAlarm(wokenAt: number, websockets: CF.WebSocket[]): Promise<void> {
+    debugLogger('onAlarm');
     return this._state.use(async (stateP) => {
       const state = await stateP;
+      debugLogger('onAlarm', state);
 
       if (websockets.length) {
         await this.actorCtx.storage.setAlarm(wokenAt + this.pingInterval);
         state.nextAlarm = wokenAt + this.pingInterval;
-        console.debug('AlarmTimer#onAlarm() scheduled next alarm at', state.nextAlarm);
+        debugLogger('AlarmTimer#onAlarm() scheduled next alarm at', state.nextAlarm);
       } else {
         state.nextAlarm = null;
-        console.debug('AlarmTimer#onAlarm() next alarm not scheduled');
+        debugLogger('AlarmTimer#onAlarm() next alarm not scheduled');
         // if no connection, no need to schedule next alarm
       }
 
@@ -57,16 +65,21 @@ export class AlarmTimer {
   }
 
   onNewConnection(): Promise<void> {
+    debugLogger('onNewConn');
     return this._state.use(async (stateP) => {
       const state = await stateP;
+      debugLogger('onNewConn', state);
       const nextAlarm = Date.now() + this.pingInterval;
       if (
-        !state.nextAlarm ||
-        state.nextAlarm > nextAlarm
+        !(
+          state.nextAlarm &&
+          Date.now() < state.nextAlarm &&
+          state.nextAlarm < nextAlarm
+        )
       ) {
         await this.actorCtx.storage.setAlarm(nextAlarm);
         state.nextAlarm = nextAlarm;
-        console.debug('AlarmTimer#onNewConn() scheduled next alarm at', state.nextAlarm);
+        debugLogger('AlarmTimer#onNewConn() scheduled next alarm at', state.nextAlarm);
       } else {
         // not overwriting the next alarm scheduled earlier than nextAlarm
       }
