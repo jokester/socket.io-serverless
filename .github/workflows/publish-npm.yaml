@@ -18,8 +18,10 @@ jobs:
           node-version: "20"
 
       - uses: pnpm/action-setup@v4
-
+    
       - run: git submodule init && git submodule update
+
+      - run: pnpm install
 
       - run: make patch-upstream lib-build
 
