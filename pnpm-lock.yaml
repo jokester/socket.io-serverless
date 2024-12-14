@@ -133,9 +133,6 @@ importers:
       socket.io-serverless:
         specifier: workspace:^
         version: link:../socket.io-serverless
-      socket.io-serverless-npm:
-        specifier: npm:socket.io-serverless@0.1.0-beta4
-        version: socket.io-serverless@0.1.0-beta4
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20241004.0
@@ -2775,9 +2772,6 @@ packages:
   socket.io-parser@4.2.4:
     resolution: {integrity: sha512-/GbIKmo8ioc+NIWIhwdecY0ge+qVBSMdgxGygevmdHj24bsfgtCmcUUcQ5ZzcylGFHsN3k4HB4Cgkl96KVnuew==}
     engines: {node: '>=10.0.0'}
-
-  socket.io-serverless@0.1.0-beta4:
-    resolution: {integrity: sha512-AZxWA9BL7qlcrWLxXtNxMQEjUCugHLmKq1Vu2FoAs00pMHEHxb478V5QUsgvEhrEZfClWMrVUKW8gv8HvZyaug==}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -5484,8 +5478,6 @@ snapshots:
       debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
-
-  socket.io-serverless@0.1.0-beta4: {}
 
   source-map-js@1.2.1: {}
 
