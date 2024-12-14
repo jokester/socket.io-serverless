@@ -6,7 +6,7 @@ Demo client app: [sio-serverless-demo-client](https://sio-serverless-demo-client
 
 ## Getting started
 
-The following example assumes you already know the Cloudflare products and `wrangler` CLI.
+The following example assumes you already know the related Cloudflare products and `wrangler` CLI.
 
 ### 1. Install the package
 
@@ -31,7 +31,7 @@ Write a [wrangler.toml](https://developers.cloudflare.com/workers/wrangler/confi
 
 Again [demo-server/](https://github.com/jokester/socket.io-serverless/tree/main/demo-server) contains a wrangler.toml you can start with.
 
-[demo-client/](https://github.com/jokester/socket.io-serverless/tree/main/demo-client) contains a frontend socket.io client app.
+[demo-client/](https://github.com/jokester/socket.io-serverless/tree/main/demo-client) contains a frontend socket.io client app using `demo-server` to send event across browsers.
 
 ## Features
 
@@ -42,7 +42,7 @@ This lib heavily rewires things to run in and take advantage of Durable Objects.
 - Support [Hibernation](https://developers.cloudflare.com/durable-objects/examples/websocket-hibernation-server/) to save costs.
     - Across Durable Object lifecycles, internal states are persisted with [storage API](https://developers.cloudflare.com/durable-objects/api/storage-api/). Read on to find the details.
 
-- Drive server-inititiated ping check by [Alarm](https://developers.cloudflare.com/durable-objects/api/alarms/) rather than `setInterval` timer.
+- Drive server-inititiated periodic ping by [Alarm](https://developers.cloudflare.com/durable-objects/api/alarms/) rather than `setInterval` timer.
 
 ## Limitations
 
