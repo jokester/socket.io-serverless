@@ -1,19 +1,27 @@
 {
   "name": "socket.io-serverless",
   "description": "A custom socket.io build to run in Cloudflare workers.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
+  "homepage": "https://github.com/jokester/socket.io-serverless",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jokester/socket.io-serverless.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jokester/socket.io-serverless/issues"
+  },
   "dependencies": {},
   "files": [
     "dist",
     "README.md",
+    "docs",
     "mocks",
     "src",
     "build.mjs",
     "tsconfig.json"
   ],
   "scripts": {
-    "prepack": "node build.mjs && cp -v ../README.md .",
     "build": "node build.mjs",
     "build:watch": "node build.mjs --watch",
     "lint": "eslint src",

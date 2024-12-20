@@ -27,6 +27,8 @@ jobs:
 
       - run: make patch-upstream lib-build
 
+      - run: cp -rv README.md docs ./socket.io-serverless/
+
       - uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_TOKEN }}
