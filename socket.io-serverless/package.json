@@ -13,7 +13,6 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "prepack": "node build.mjs && cp -v ../README.md .",
     "build": "node build.mjs",
     "build:watch": "node build.mjs --watch",
     "lint": "eslint src",

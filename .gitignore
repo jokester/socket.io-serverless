@@ -28,3 +28,4 @@ dist-ssr
 .yarn
 *.tgz
 /socket.io-serverless/README.md
+/socket.io-serverless/docs
