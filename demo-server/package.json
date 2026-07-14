@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "description": "a simple socket.io server",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "gts lint",
     "clean": "gts clean",
     "dev:cf": "DEBUG=limb:*,-socket.io:* wrangler dev",
@@ -23,6 +24,7 @@
     "socket.io-serverless": "workspace:^"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.18.4",
     "@cloudflare/workers-types": "^4.20241004.0",
     "@tsconfig/strictest": "^2.0.5",
     "@types/debug": "^4.1.12",
@@ -31,6 +33,8 @@
     "base64id": "^2.0.0",
     "tsx": "*",
     "typescript": "*",
+    "vite": "^6.0.0",
+    "vitest": "^4.1.0",
     "wrangler": "^3.80"
   }
 }

@@ -15,6 +15,8 @@ socket.io-serverless/   # Main library (the npm package)
   dist/                 # Build output (esm format, non-minified)
   mocks/                # Stub modules replacing Node.js APIs for CF environment
 demo-server/            # Backend demo app (CF Worker + Durable Objects)
+  test/                 # Vitest + @cloudflare/vitest-pool-workers integration tests
+  vitest.config.mts     # Vitest config (runs DOs in workerd via Miniflare)
 demo-client/            # Frontend demo app (Preact + Vite + Tailwind)
 shared-config/          # Shared tsconfig, eslint, dprint, jest configs
 socket.io/              # Git submodule (upstream socket.io monorepo)
@@ -79,13 +81,29 @@ make demo-server-bundle # wrangler deploy --dry-run
 pnpm run dev:node       # tsx watch src/node/main.ts
 ```
 
+### Run integration tests
+The tests use `@cloudflare/vitest-pool-workers` to spin up the real `workerd` runtime locally via Miniflare, with the Durable Object bindings from `demo-server/wrangler.toml` honored. They exercise the full Worker → EngineActor → SocketActor pipeline, inspect DO storage via `runInDurableObject`, and flush the 30 s heartbeat `AlarmTimer` via `runDurableObjectAlarm`.
+
+```bash
+make lib-build                 # the Worker imports the bundled library, so build it first
+pnpm run --filter demo-server test        # vitest run
+pnpm run --filter demo-server test:watch  # vitest watch
+```
+
+Available test APIs (imported from `cloudflare:test` / `cloudflare:workers`):
+- `env.engineActor` / `env.socketActor` — DO namespace bindings, exactly as in production
+- `exports.default.fetch(req)` — invoke the Worker entrypoint as a real upgrade request
+- `runInDurableObject(stub, cb)` — inspect or seed DO instance state and `state.storage` directly
+- `runDurableObjectAlarm(stub)` — fire the EngineActor's `AlarmTimer` heartbeat immediately
+- `evictDurableObject(stub)` — test hibernation recovery (hibernatable WebSockets + persisted state)
+
 ## Key Technical Details
 
 - **Build tooling**: esbuild (not wrangler) bundles `socket.io-serverless` with custom resolution plugins in `build.mjs`. Node.js stdlib imports (`http`, `fs`, `crypto`, etc.) are rewired to mock stubs in `mocks/`. Socket.io upstream TS source is imported directly (bypassing npm export maps).
 - **Formatter**: dprint (config in `shared-config/dprint.json` or per-package)
 - **Linter**: ESLint flat config (`.mjs` files in `shared-config/`)
 - **TypeScript**: extends `@tsconfig/strictest`, moduleResolution is `bundler`
-- **No tests exist yet** — jest is configured but no test files are written
+- **Integration tests** live in `demo-server/test/` and use Vitest + `@cloudflare/vitest-pool-workers` (no jest tests). See "Run integration tests" above.
 - Only **WebSocket transport** is supported; engine.io protocol v4 only
 - Parent namespaces must be defined in `onServerCreated` callback (no dynamic/function-based namespace creation)
 - Room memberships do NOT survive DO hibernation
