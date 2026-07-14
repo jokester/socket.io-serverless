@@ -224,9 +224,6 @@ importers:
 
   socket.io/packages/engine.io:
     dependencies:
-      '@types/cookie':
-        specifier: ^0.4.1
-        version: 0.4.1
       '@types/cors':
         specifier: ^2.8.12
         version: 2.8.17
@@ -246,14 +243,14 @@ importers:
         specifier: ~2.8.5
         version: 2.8.5
       debug:
-        specifier: ~4.3.1
-        version: 4.3.7
+        specifier: ~4.4.1
+        version: 4.4.3
       engine.io-parser:
         specifier: ~5.2.1
         version: 5.2.3
       ws:
-        specifier: ~8.17.1
-        version: 8.17.1
+        specifier: ~8.18.3
+        version: 8.18.3
 
   socket.io/packages/engine.io-parser: {}
 
@@ -269,8 +266,8 @@ importers:
         specifier: ~2.8.5
         version: 2.8.5
       debug:
-        specifier: ~4.3.2
-        version: 4.3.7
+        specifier: ~4.4.1
+        version: 4.4.3
       engine.io:
         specifier: ~6.6.0
         version: 6.6.1
@@ -284,11 +281,11 @@ importers:
   socket.io/packages/socket.io-adapter:
     dependencies:
       debug:
-        specifier: ~4.3.4
-        version: 4.3.7
+        specifier: ~4.4.1
+        version: 4.4.3
       ws:
-        specifier: ~8.17.1
-        version: 8.17.1
+        specifier: ~8.18.3
+        version: 8.18.3
 
   socket.io/packages/socket.io-parser:
     dependencies:
@@ -296,8 +293,8 @@ importers:
         specifier: ~3.1.0
         version: 3.1.2
       debug:
-        specifier: ~4.3.1
-        version: 4.3.7
+        specifier: ~4.4.1
+        version: 4.4.3
 
 packages:
 
@@ -2365,6 +2362,15 @@ packages:
       supports-color:
         optional: true
 
+  debug@4.4.3:
+    resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
   decamelize-keys@1.1.1:
     resolution: {integrity: sha512-WiPxgEirIV0/eIOMcnFBA3/IJZAZqKnwAwWyvvdi4lsr1WCN22nhdf/3db3DoZcUjTV2SqfzIwNyp6y2xs3nmg==}
     engines: {node: '>=0.10.0'}
@@ -4017,6 +4023,18 @@ packages:
       utf-8-validate:
         optional: true
 
+  ws@8.18.3:
+    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   ws@8.21.0:
     resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
@@ -4110,7 +4128,7 @@ snapshots:
       '@babel/traverse': 7.25.7
       '@babel/types': 7.25.7
       convert-source-map: 2.0.0
-      debug: 4.3.7
+      debug: 4.4.3
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -4224,7 +4242,7 @@ snapshots:
       '@babel/parser': 7.25.7
       '@babel/template': 7.25.7
       '@babel/types': 7.25.7
-      debug: 4.3.7
+      debug: 4.4.3
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -4818,7 +4836,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.7
+      debug: 4.4.3
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.2
@@ -4836,7 +4854,7 @@ snapshots:
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.3.7
+      debug: 4.4.3
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -5256,7 +5274,7 @@ snapshots:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.0)(typescript@5.6.2)
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.6.2)
-      debug: 4.3.7
+      debug: 4.4.3
       eslint: 8.57.0
       graphemer: 1.4.0
       ignore: 5.3.2
@@ -5273,7 +5291,7 @@ snapshots:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.6.2)
-      debug: 4.3.7
+      debug: 4.4.3
       eslint: 8.57.0
     optionalDependencies:
       typescript: 5.6.2
@@ -5289,7 +5307,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.6.2)
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.6.2)
-      debug: 4.3.7
+      debug: 4.4.3
       eslint: 8.57.0
       tsutils: 3.21.0(typescript@5.6.2)
     optionalDependencies:
@@ -5303,7 +5321,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
-      debug: 4.3.7
+      debug: 4.4.3
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.6.3
@@ -5512,7 +5530,7 @@ snapshots:
 
   capnp-ts@0.7.0:
     dependencies:
-      debug: 4.3.7
+      debug: 4.4.3
       tslib: 2.7.0
     transitivePeerDependencies:
       - supports-color
@@ -5643,6 +5661,10 @@ snapshots:
   data-uri-to-buffer@2.0.2: {}
 
   debug@4.3.7:
+    dependencies:
+      ms: 2.1.3
+
+  debug@4.4.3:
     dependencies:
       ms: 2.1.3
 
@@ -5999,7 +6021,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.3
-      debug: 4.3.7
+      debug: 4.4.3
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -6480,7 +6502,7 @@ snapshots:
       stoppable: 1.1.0
       undici: 5.28.4
       workerd: 1.20240925.0
-      ws: 8.17.1
+      ws: 8.18.3
       youch: 3.3.3
       zod: 3.23.8
     transitivePeerDependencies:
@@ -7453,6 +7475,8 @@ snapshots:
       signal-exit: 3.0.7
 
   ws@8.17.1: {}
+
+  ws@8.18.3: {}
 
   ws@8.21.0: {}
 

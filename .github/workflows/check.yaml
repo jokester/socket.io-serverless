@@ -17,7 +17,7 @@ jobs:
       # tag ref so `make patch-upstream` (which runs `git reset --hard socket.io@4.8.1`)
       # can resolve it.
       - run: git submodule update --init
-      - run: git -C socket.io fetch --depth 1 origin socket.io@4.8.1
+      - run: git -C socket.io fetch --depth 1 origin socket.io@4.8.3
 
       - uses: pnpm/action-setup@v4
         with:

@@ -40,7 +40,7 @@ A **Worker entrypoint** (thin HTTP handler) forwards upgrade requests to `Engine
 - pnpm 9.12.0
 - Node.js 20+
 - The `socket.io` git submodule must be initialized: `git submodule update --init`
-- Then patch it: `make patch-upstream` (or `cd socket.io && git reset --hard socket.io@4.8.1 && git reset . && git checkout -- . && git apply < ../patches/0001-workarounds-to-upstream-socket.io.patch`)
+- Then patch it: `make patch-upstream` (or `cd socket.io && git fetch --depth 1 origin socket.io@4.8.3 && git reset --hard FETCH_HEAD && git reset . && git checkout -- . && git apply < ../patches/0001-workarounds-to-upstream-socket.io.patch`)
 
 ### Install
 ```bash
