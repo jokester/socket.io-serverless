@@ -86,8 +86,8 @@ The tests use `@cloudflare/vitest-pool-workers` to spin up the real `workerd` ru
 
 ```bash
 make lib-build                 # the Worker imports the bundled library, so build it first
-pnpm run --filter demo-server test        # vitest run
-pnpm run --filter demo-server test:watch  # vitest watch
+pnpm run --filter ./demo-server test        # vitest run
+pnpm run --filter ./demo-server test:watch  # vitest watch
 ```
 
 Available test APIs (imported from `cloudflare:test` / `cloudflare:workers`):
