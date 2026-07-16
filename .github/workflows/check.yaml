@@ -1,0 +1,50 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request: {}
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # init submodule (pinned to the socket.io@4.8.1 tag commit) and fetch the
+      # tag ref so `make patch-upstream` (which runs `git reset --hard socket.io@4.8.1`)
+      # can resolve it.
+      - run: git submodule update --init
+      - run: git -C socket.io fetch --depth 1 origin socket.io@4.8.3
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - run: pnpm install
+
+      - name: Patch upstream socket.io and build library
+        run: make patch-upstream lib-build
+
+      - name: Format check (library)
+        run: pnpm --filter ./socket.io-serverless exec dprint check
+
+      - name: Typecheck library (non-blocking, pre-existing upstream errors)
+        continue-on-error: true
+        run: pnpm --filter ./socket.io-serverless run typecheck
+
+      - name: Build demo-server Worker (wrangler dry-run)
+        run: pnpm run --filter ./demo-server build:cf
+
+      - name: Build demo-client (vite build)
+        run: pnpm run --filter ./demo-client build
+
+      - name: Run integration tests
+        run: pnpm run --filter ./demo-server test

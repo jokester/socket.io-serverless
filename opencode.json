@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "formatter": {
+    "dprint": {
+      "command": ["pnpm", "run", "--filter", "socket.io-serverless", "format"],
+      "extensions": [".ts", ".js", ".mjs", ".json"]
+    }
+  },
+  "instructions": [
+    "docs/development.md",
+    "docs/how-it-works.md"
+  ]
+}

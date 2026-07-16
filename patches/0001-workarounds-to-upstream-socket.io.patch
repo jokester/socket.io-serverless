@@ -1,22 +1,8 @@
-From 1f4a58f306ae0522da74bda2a449031296b3d967 Mon Sep 17 00:00:00 2001
-From: Wang Guan <momocraft@gmail.com>
-Date: Sun, 13 Oct 2024 01:41:00 +0800
-Subject: [PATCH] commit again
-
----
- packages/engine.io-client/package.json | 10 +++++-----
- packages/engine.io-parser/package.json |  9 +--------
- packages/engine.io/package.json        |  5 -----
- packages/socket.io/lib/client.ts       |  4 ++--
- packages/socket.io/lib/index.ts        |  5 -----
- packages/socket.io/package.json        |  5 -----
- 6 files changed, 8 insertions(+), 30 deletions(-)
-
 diff --git a/packages/engine.io-client/package.json b/packages/engine.io-client/package.json
-index 0a76e8c..bbf25c6 100644
+index 197aa40..85d04fb 100644
 --- a/packages/engine.io-client/package.json
 +++ b/packages/engine.io-client/package.json
-@@ -71,13 +71,13 @@
+@@ -72,13 +72,13 @@
      "prepack": "npm run compile"
    },
    "browser": {
@@ -35,8 +21,15 @@ index 0a76e8c..bbf25c6 100644
    },
    "homepage": "https://github.com/socketio/socket.io/tree/main/packages/engine.io-client#readme",
    "repository": {
+@@ -92,4 +92,4 @@
+     "build/",
+     "dist/"
+   ]
+-}
++}
+\ No newline at end of file
 diff --git a/packages/engine.io-parser/package.json b/packages/engine.io-parser/package.json
-index d661db3..6066cbd 100644
+index f7926d8..0c721f9 100644
 --- a/packages/engine.io-parser/package.json
 +++ b/packages/engine.io-parser/package.json
 @@ -5,10 +5,6 @@
@@ -50,7 +43,7 @@ index d661db3..6066cbd 100644
    "types": "build/esm/index.d.ts",
    "scripts": {
      "compile": "rimraf ./build && tsc && tsc -p tsconfig.esm.json && ./postcompile.sh",
-@@ -31,11 +27,8 @@
+@@ -31,13 +27,10 @@
      "build/"
    ],
    "browser": {
@@ -63,8 +56,12 @@ index d661db3..6066cbd 100644
    },
    "engines": {
      "node": ">=10.0.0"
+   }
+-}
++}
+\ No newline at end of file
 diff --git a/packages/engine.io/package.json b/packages/engine.io/package.json
-index ccd64cf..e707790 100644
+index 0a8ba65..59a84aa 100644
 --- a/packages/engine.io/package.json
 +++ b/packages/engine.io/package.json
 @@ -5,11 +5,6 @@
@@ -79,24 +76,18 @@ index ccd64cf..e707790 100644
    "author": "Guillermo Rauch <guillermo@learnboost.com>",
    "contributors": [
      {
-diff --git a/packages/socket.io/lib/client.ts b/packages/socket.io/lib/client.ts
-index 6ca7b77..c148c2d 100644
---- a/packages/socket.io/lib/client.ts
-+++ b/packages/socket.io/lib/client.ts
-@@ -1,6 +1,6 @@
- import { Decoder, Encoder, Packet, PacketType } from "socket.io-parser";
--import debugModule = require("debug");
--import url = require("url");
-+import debugModule from "debug";
-+import url from "url";
- import type { IncomingMessage } from "http";
- import type { Server } from "./index";
- import type { Namespace } from "./namespace";
+@@ -67,4 +62,4 @@
+   "engines": {
+     "node": ">=10.2.0"
+   }
+-}
++}
+\ No newline at end of file
 diff --git a/packages/socket.io/lib/index.ts b/packages/socket.io/lib/index.ts
-index b77b8fd..ec527ea 100644
+index 6027859..307d6f1 100644
 --- a/packages/socket.io/lib/index.ts
 +++ b/packages/socket.io/lib/index.ts
-@@ -1163,11 +1163,6 @@ emitterMethods.forEach(function (fn) {
+@@ -1181,11 +1181,6 @@ emitterMethods.forEach(function (fn) {
    };
  });
  
@@ -109,21 +100,21 @@ index b77b8fd..ec527ea 100644
    Socket,
    DisconnectReason,
 diff --git a/packages/socket.io/package.json b/packages/socket.io/package.json
-index 8c52110..49a1e18 100644
+index a1a683b..f60cc97 100644
 --- a/packages/socket.io/package.json
 +++ b/packages/socket.io/package.json
-@@ -25,11 +25,6 @@
+@@ -25,14 +25,6 @@
    },
    "type": "commonjs",
    "main": "./dist/index.js",
 -  "exports": {
--    "types": "./dist/index.d.ts",
--    "import": "./wrapper.mjs",
--    "require": "./dist/index.js"
+-    ".": {
+-      "types": "./dist/index.d.ts",
+-      "import": "./wrapper.mjs",
+-      "require": "./dist/index.js"
+-     },
+-    "./package.json": "./package.json"
 -  },
    "types": "./dist/index.d.ts",
    "license": "MIT",
    "homepage": "https://github.com/socketio/socket.io/tree/main/packages/socket.io#readme",
--- 
-2.39.5
-
